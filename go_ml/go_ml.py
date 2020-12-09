@@ -24,52 +24,14 @@ from nltk.corpus import stopwords
 import re
 import numpy as np
 import pandas as pd
-# from pydrive.auth import GoogleAuth
-# from pydrive.drive import GoogleDrive
-# from google.colab import auth
-# from oauth2client.client import GoogleCredentials
-# Authenticate and create the PyDrive client.
-# auth.authenticate_user()
-# gauth = GoogleAuth()
-# gauth.credentials = GoogleCredentials.get_application_default()
-# drive = GoogleDrive(gauth)
 
 """## Import Libraries"""
 
-# from wordcloud import WordCloud
 nltk.download('punkt')
 nltk.download('stopwords')
-# import matplotlib.pyplot as plt
-# from matplotlib.colors import ListedColormap
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import StandardScaler
-# from sklearn.datasets import make_moons, make_circles, make_classification
-# from sklearn.neural_network import MLPClassifier
-# from sklearn.neighbors import KNeighborsClassifier
-# from sklearn.svm import SVC
-# from sklearn.gaussian_process import GaussianProcessClassifier
-# from sklearn.gaussian_process.kernels import RBF
-# from sklearn.tree import DecisionTreeClassifier
-# from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-# from sklearn.naive_bayes import GaussianNB
-# from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-# from xgboost import XGBClassifier
-# from sklearn.metrics import accuracy_score
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.naive_bayes import MultinomialNB
-# from sklearn.linear_model import SGDClassifier
-# from sklearn.feature_extraction.text import CountVectorizer
 
 
 """## Stance Detection"""
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/1woRoo1pna6hKoQ62JI3My2k4KCm7_6hh/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('SVM_stance_detection.model')
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/1tLxMwnfLhcmsVjWHnEa9TeeCrSdVHDM0/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('vector_stance_detection.pkl')
 
 
 class StanceDetection():
@@ -77,11 +39,6 @@ class StanceDetection():
         self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
             open(filenamePkl, 'rb'))
-
-    # def __init__(self):
-    #     self.clf = pickle.load(open('SVM_stance_detection.model', 'rb'))
-    #     self.vector: TfidfVectorizer = pickle.load(
-    #         open('vector_stance_detection.pkl', 'rb'))
 
     def __predict(self, text):
         a = self.vector.transform([text])
@@ -96,24 +53,8 @@ class StanceDetection():
             [w for w in text.split() if w not in stopwords.words('english')])
         return self.__predict(text)
 
-# def getStanceDetectionScore(text):
-#     text = re.sub('[^a-zA-Z ]', '', text).lower()
-#     text = ' '.join(
-#         [w for w in text.split() if w not in stopwords.words('english')])
-#     return StanceDetection().predict(text)
-
-# getStanceDetectionScore("hey man how are you?")
-
 
 """## Clickbait Detection"""
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/16norntMWxj2ljjRY8UtFpyhtd2teEYJe/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('RF_clickbait.model')
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/1wEXHnjj0yAeTKJmj-noUIKFqhrMuHpwT/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('vector_clickbait.pkl')
 
 
 class Clickbait():
@@ -122,11 +63,6 @@ class Clickbait():
         self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
             open(filenamePkl, 'rb'))
-
-    # def __init__(self):
-    #     self.clf = pickle.load(open('RF_clickbait.model', 'rb'))
-    #     self.vector: TfidfVectorizer = pickle.load(
-    #         open('vector_clickbait.pkl', 'rb'))
 
     def __predict(self, text):
         a = self.vector.transform([text])
@@ -141,18 +77,8 @@ class Clickbait():
             [w for w in text.split() if w not in stopwords.words('english')])
         return self.__predict(text)
 
-# getClickbaitScore("Should You bring the money now")
-
 
 """## News Coverage"""
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/1AKTM3HyxsC0uKfzVKsNdc_JQ5TXnjbht/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('RF_news_coverage.model')
-
-# temp_drive = drive.CreateFile(
-#     {'id': 'https://drive.google.com/file/d/1VAZF05pt59sYNjY4siLrkHY1208cf3rS/view?usp=sharing'.split('/')[-2]})
-# temp_drive.GetContentFile('vector_news_coverage.pkl')
 
 
 class NewsCoverage():
@@ -161,11 +87,6 @@ class NewsCoverage():
         self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
             open(filenamePkl, 'rb'))
-
-    # def __init__(self):
-    #     self.clf = pickle.load(open('RF_news_coverage.model', 'rb'))
-    #     self.vector: TfidfVectorizer = pickle.load(
-    #         open('vector_news_coverage.pkl', 'rb'))
 
     def __predict(self, text):
         a = self.vector.transform([text])
@@ -180,8 +101,6 @@ class NewsCoverage():
             [w for w in text.split() if w not in stopwords.words('english')])
         return self.__predict(text)
 
-# getNewsCoverageScore("Donald trump will win")
-
 
 """## Writing Style"""
 
@@ -190,12 +109,6 @@ class WritingStyle():
 
     def __init__(self, filenamePkl):
         self.clf = pickle.load(open(filenamePkl, 'rb'))
-
-    # def __init__(self):
-    #     temp_writtingStyle_drive = drive.CreateFile(
-    #         {'id': 'https://drive.google.com/file/d/1iRZvUoFB6nRp0LNtyzDNYOFtNxF8Szxs/view?usp=sharing'.split('/')[-2]})
-    #     temp_writtingStyle_drive.GetContentFile('writting_style.pkl')
-    #     self.clf = pickle.load(open('writting_style.pkl', 'rb'))
 
     def __predict(self, text):
         predicted = self.clf.predict([text])
@@ -207,51 +120,5 @@ class WritingStyle():
         binaryValue, probValue = self.__predict(text)
         return (1 - float(probValue))
 
-# writingstyle = WritingStyle()
-
-# def WritingStyleScore(text):  # return between 0 and 1, being 0 = True,  1 = Fake
-#     binaryValue, probValue = writingstyle.predict(text)
-#     return (1 - float(probValue))
-
-# print(WritingStyleScore("College Republicans, YAF Sue Berkeley over Ann Coulter Event - Breitbart"))
-
-# """## Identify Fake News"""
-
 # def isFakeNews(text, headline="", numAuthors = 0, source = "", party =""):
 #     accur = [0.87, 0.70, 0.82, 0.85] # using the (normalized) accuracy as weigths
-#     w = [float(i)/sum(accur) for i in accur]
-#     sumW = 0
-#     prob = []
-
-#     if text:
-#         prob.append(w[0] * getStanceDetectionScore(text))
-#         sumW += w[0]
-#     if text:
-#         prob.append(w[1] * getClickbaitScore(text))
-#         sumW += w[1]
-#     if text:
-#         prob.append(w[2] * getNewsCoverageScore(text))
-#         sumW += w[2]
-#     if text:
-#         prob.append(w[3] * WritingStyleScore(text))
-#         sumW += w[3]
-
-
-#     probTotal = sum(prob[0:len(prob)]) / sumW
-#     return probTotal
-
-# result = isFakeNews("Yesterday, the Brazilian soccer team won the world cup by defeating Argentina", "World Cup ends", 1, "cnn.com", "republican")
-# print(result)
-
-# if result < 0.05 :
-#   print("Pants-Fire!")
-# elif result < 0.20:
-#   print("False")
-# elif result < 0.40:
-#   print("Barely-True")
-# elif result < 0.60:
-#   print("Half-True")
-# elif result < 0.80:
-#   print("Mostly-True")
-# else:
-#     print("True")
