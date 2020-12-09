@@ -12,7 +12,7 @@ Original file is located at
 - Praveen Kumar Thakur - News Coverage
 - Amit Vijapure - Stance Detection
 - Mayuri Bhise - ClickBait
-- Dhwani Sanghvi - Writing Style
+- Dhwani Sanghvi -  Writing Style
 
 ## Connect to Google Drive to read datasets and pickled models
 """
