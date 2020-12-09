@@ -32,7 +32,7 @@ nltk.download('wordnet')
 
 class StanceDitectionFeature():
 
-    # _wnl = nltk.WordNetLemmatizer()
+    _wnl = nltk.WordNetLemmatizer()
 
     def gen_or_load_feats(self,feat_fn, headlines, bodies, feature_file):
       feats = feat_fn(headlines, bodies)
