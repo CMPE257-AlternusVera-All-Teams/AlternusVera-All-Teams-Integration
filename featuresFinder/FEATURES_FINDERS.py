@@ -23,15 +23,15 @@ import statistics
 from gensim.models.doc2vec import TaggedDocument
 # stop words are, is, the etc. which are not needed for model
 import nltk
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('vader_lexicon')
 nltk.download("stopwords") 
 
 from nltk.corpus import stopwords
 from nltk.corpus import words
 from textblob import TextBlob, Word
 
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('vader_lexicon')
 
 
 
@@ -468,7 +468,7 @@ class ToxicityFeature():
 # ----------------- helpers -------------------- #
 english_stemmer = nltk.stem.SnowballStemmer('english')
 token_pattern = r"(?u)\b\w\w+\b"
-stopwords = set(nltk.corpus.stopwords.words('english'))
+stopwords2 = set(nltk.corpus.stopwords.words('english'))
 
 
 def stem_tokens(tokens, stemmer):
@@ -488,7 +488,7 @@ def preprocess_data(line,
     if stem:
         tokens_stemmed = stem_tokens(tokens, english_stemmer)
     if exclude_stopword:
-        tokens_stemmed = [x for x in tokens_stemmed if x not in stopwords]
+        tokens_stemmed = [x for x in tokens_stemmed if x not in stopwords2]
 
     return tokens_stemmed
 
