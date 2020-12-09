@@ -16,29 +16,10 @@ from string import punctuation
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
+nltk.download('wordnet')
 import string
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 stemmer = SnowballStemmer('english')
-
-# nltk.download('wordnet')
-#from pydrive.auth import GoogleAuth
-#from pydrive.drive import GoogleDrive
-#from google.colab import auth
-#from oauth2client.client import GoogleCredentials
-
-"""Fetching the model from github:   
-Random Forest produced best result 
-"""
-
-# import requests, zipfile, io
-# def download_url(url, save_path, chunk_size=128):
-#     r = requests.get(url)
-#     z = zipfile.ZipFile(io.BytesIO(r.content))
-#     z.extractall(save_path)
-
-# download_url('https://github.com/jrangu/Datasets/blob/master/randomforest.zip?raw=true', '/content/')
-
-
 
 """Loading the pickled model and predicting the score"""
 sw = stopwords.words('english')
@@ -174,3 +155,46 @@ class Seekers_ClickBait():
     return probValue
 
 #print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
+
+
+
+class Seekers_Spam():
+
+  def __init__(self, loaded_tdIdfModel, loaded_model):
+    self.loaded_tdIdfModel = self.load(loaded_tdIdfModel)
+    self.loaded_model = self.load(loaded_model)
+    
+  def load(self, path):
+    with open(path, 'rb') as file:
+      return pickle.load(file)
+
+  def remove_stop_and_short_words(self,text):
+    text = [word.lower() for word in text.split() if (word.lower() not in sw) and (len(word)>3)]
+    return " ".join(text)
+  
+  def lemmatize_stemming(self,text):
+    return stemmer.stem(WordNetLemmatizer().lemmatize(text, pos='v'))
+  
+  def remove_punctuation(self,text):
+    translator = str.maketrans('', '', string.punctuation)
+    return text.translate(translator)
+    
+  def tokenization(self,text):
+    lst=text.split()
+    return lst
+  
+  def process_data(self,text):
+    return loaded_tdIdfModel.transform(text)
+
+  def predict(self, text):
+    dfrme = pd.DataFrame(index=[0], columns=['text'])
+    dfrme['text'] = text
+    predict=dfrme['text'].apply(self.tokenization)
+    predict = predict.apply(lambda x: ''.join(i+' ' for i in x))
+    text = self.loaded_tdIdfModel.transform(predict)
+    # processedText = self.process_data(dfrme['text'])
+    result = self.loaded_model.predict_proba(text.toarray())[:,1][0]
+    # print(result)
+    return result
+
+#print('op ', Seekers_Spam('TFidfvectorizer.sav','final_SpamModel.sav').predict('text here'))
