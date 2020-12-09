@@ -43,7 +43,7 @@ class Topics_with_LDA_Bigram:
     # Remove new line characters
     dt_processed = [re.sub(r'[^\w\s]','',sent) for sent in dt_processed]
     dt_processed = [re.sub("'"," ",sent) for sent in dt_processed]
-    data_words_processed = list(Topics_with_LDA_Bigram.sent_to_words(dt_processed))
+    data_words_processed = list(self.sent_to_words(dt_processed))
     return data_words_processed
   
     # Define functions for stopwords, bigrams, trigrams and lemmatization
@@ -75,7 +75,7 @@ class Topics_with_LDA_Bigram:
   def create_bigrams(self):
     Bigrams = []
     for i in range(len(data_words_processed)):
-      Bigrams.append(Topics_with_LDA_Bigram.extract_bigrams(data_words_processed[i]))
+      Bigrams.append(self.extract_bigrams(data_words_processed[i]))
     return Bigrams    
 
   def lda_model_final(self, corpus, id2word):
@@ -163,21 +163,21 @@ class Topics_with_LDA_Bigram:
     df_testing.head()
 
     #encoding the label from text to numeric value
-    #df_testing = Topics_with_LDA_Bigram.encodeLabel(df_testing)
+    #df_testing = self.encodeLabel(df_testing)
 
     #data pre-process
-    dt_words_processed =  Topics_with_LDA_Bigram.data_preprocess(df_testing)
+    dt_words_processed =  self.data_preprocess(df_testing)
 
     # Remove Stop Words
-    dt_nostops = Topics_with_LDA_Bigram.remove_stopwords(dt_words_processed)
+    dt_nostops = self.remove_stopwords(dt_words_processed)
 
     # Form Bigrams
     dt_words_bigrams = []
     for i in range(len(dt_nostops)):
-      dt_words_bigrams.append(Topics_with_LDA_Bigram.extract_bigrams(dt_nostops[i]))  
+      dt_words_bigrams.append(self.extract_bigrams(dt_nostops[i]))  
         
     # Do lemmatization keeping only noun, adj, vb, adv
-    dt_lemmatized = Topics_with_LDA_Bigram.lemmatization(dt_words_bigrams)
+    dt_lemmatized = self.lemmatization(dt_words_bigrams)
     print(dt_lemmatized) 
 
 
@@ -192,10 +192,10 @@ class Topics_with_LDA_Bigram:
 
       
     #Bigram LDA Model
-    lda_model_bigram =  Topics_with_LDA_Bigram.lda_model_final(corpus, id2word)
+    lda_model_bigram =  self.lda_model_final(corpus, id2word)
 
     #
-    dt_topic_sents_keywords = Topics_with_LDA_Bigram.format_topics_sentences(ldamodel=lda_model_bigram, corpus=corpus, texts=dt_words_processed)
+    dt_topic_sents_keywords = self.format_topics_sentences(ldamodel=lda_model_bigram, corpus=corpus, texts=dt_words_processed)
 
     # Format
     dt_dominant_topic = dt_topic_sents_keywords.reset_index()
@@ -205,7 +205,7 @@ class Topics_with_LDA_Bigram:
     dt_dominant_topic.head()
 
     #Distillation - Sentiment analysis score
-    sentiment_score_dt = Topics_with_LDA_Bigram.sentiment_analyzer_scores(df_testing)
+    sentiment_score_dt = self.sentiment_analyzer_scores(df_testing)
     print(sentiment_score_dt)
 
     #append dataset with sentiment label and normalized encoded value
@@ -219,7 +219,7 @@ class Topics_with_LDA_Bigram:
 
     #Get test data for classification
 
-    X_test = np.array(Topics_with_LDA_Bigram.testing_dataset_vector(df_testing))
+    X_test = np.array(self.testing_dataset_vector(df_testing))
     X_test =  X_test.reshape(-1, 1)
 
 #    # fake_news_classifier = pickle.load(open('/content/drive/MyDrive/MLFall2020/girlswhocode/models/LogisticRegression_model.sav', 'rb'))
