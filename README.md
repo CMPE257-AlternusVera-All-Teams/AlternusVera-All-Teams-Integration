@@ -1,0 +1,1 @@
+# AlternusVera-All-Teams-Integration
