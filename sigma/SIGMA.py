@@ -142,9 +142,9 @@ class MalicousAccount():
     def __init__( self, filename ):
         self.model = self.load(filename)
 
-    def predict( self, cls, tweetText, nlp ): 
+    def predict( self, tweetText, nlp ): 
         tweetVector = self.__convert2vector(tweetText, nlp)
-        predictionResult =  cls.predict(tweetVector)
+        predictionResult =  self.model.predict(tweetVector)
         botScoreResult, labelResult = self.__predictionScore(predictionResult) 
         # print('label: ', predictionResult)
         # print('label: ', labelResult)
