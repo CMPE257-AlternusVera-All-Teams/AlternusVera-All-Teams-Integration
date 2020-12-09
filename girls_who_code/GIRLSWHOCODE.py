@@ -8,6 +8,14 @@ Original file is located at
 """
 
 class Topics_with_LDA_Bigram: 
+
+  def __init__(self, filenameModelLog): 
+      self.modelLog = self.__load(filenameModelLog)
+
+  def __load(self, path):
+      with open(path, 'rb') as file:
+          return pickle.load(file) 
+
   def encodeLabel(df):
     df.Label[df.Label == 'FALSE'] = 0
     df.Label[df.Label == 'half-true'] = 1
@@ -221,10 +229,4 @@ class Topics_with_LDA_Bigram:
 
     score = 1 - float(predicedProb)
     return score
-
-    def __init__(self, filenameModelLog): 
-        self.modelLog = self.__load(filenameModelLog)
-
-    def __load(self, path):
-        with open(path, 'rb') as file:
-            return pickle.load(file)    
+   
