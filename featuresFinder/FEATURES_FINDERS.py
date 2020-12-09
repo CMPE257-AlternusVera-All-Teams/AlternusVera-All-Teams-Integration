@@ -1170,7 +1170,9 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         
         # word vectors weighted by normalized tf-idf coefficient?
         #headlineVec = [0]
-        headlineVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Headline_unigram_array))
+
+#        headlineVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Headline_unigram_array))
+        headlineVec = list(map(lambda x: reduce(np.add, [self.modelGensim.model[y] for y in x if y in self.modelGensim.model], [0.]*300), Headline_unigram_array))
         headlineVec = np.array(headlineVec)
         #print('headlineVec:')
         #print(headlineVec)
@@ -1204,7 +1206,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         #print(Body_unigram_array)
         #print(Body_unigram_array.shape)
         #bodyVec = [0]
-        bodyVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Body_unigram_array))
+        bodyVec = list(map(lambda x: reduce(np.add, [self.modelGensim.model[y] for y in x if y in self.modelGensim.model], [0.]*300), Body_unigram_array))
         bodyVec = np.array(bodyVec)
         bodyVec = normalize(bodyVec)
         #print('bodyVec')
@@ -1427,9 +1429,10 @@ class SentimentFeatureGenerator(FeatureGenerator):
 
 class TitleVsBody():
 
-    def __init__(self, filenameModelLog, filenameModelXgb): #, filenameBestModel, base_path):
+    def __init__(self, filenameModelLog, filenameModelXgb, gensimModel): #, filenameBestModel, base_path):
         self.modelLog = self.__load(filenameModelLog)
         self.modelXgb = self.__load(filenameModelXgb)
+        self.modelGensim = gensimModel
 
 #        self.bestModel = self.__load(filenameBestModel)
 #        self.base_path = base_path
@@ -1509,7 +1512,7 @@ class TitleVsBody():
         #print(type(svd))
 
 
-        w2v_fg = Word2VecFeatureGenerator()
+        w2v_fg = Word2VecFeatureGenerator(self.modelGensim, name='word2vecFeatureGenerator')
         # w2v = [headlineVecTrain, bodyVecTrain, simVecTrain]
         w2v = w2v_fg.process(data, save_file=False, test_only=True)
         #print("w2v len:", len(w2v))
