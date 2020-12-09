@@ -28,6 +28,9 @@ from textblob import TextBlob, Word
 import nltk
 nltk.download('punkt')
 nltk.download('wordnet')
+nltk.download('vader_lexicon')
+nltk.download("stopwords") 
+
 
 
 class StanceDitectionFeature():
