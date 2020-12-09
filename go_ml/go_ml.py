@@ -63,35 +63,44 @@ nltk.download('stopwords')
 
 """## Stance Detection"""
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/1woRoo1pna6hKoQ62JI3My2k4KCm7_6hh/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('SVM_stance_detection.model')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/1woRoo1pna6hKoQ62JI3My2k4KCm7_6hh/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('SVM_stance_detection.model')
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/1tLxMwnfLhcmsVjWHnEa9TeeCrSdVHDM0/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('vector_stance_detection.pkl')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/1tLxMwnfLhcmsVjWHnEa9TeeCrSdVHDM0/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('vector_stance_detection.pkl')
 
 
 class StanceDetection():
-
-    def __init__(self):
-        self.clf = pickle.load(open('SVM_stance_detection.model', 'rb'))
+    def __init__(self, filenameModel, filenamePkl):
+        self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
-            open('vector_stance_detection.pkl', 'rb'))
+            open(filenamePkl, 'rb'))
 
-    def predict(self, text):
+    # def __init__(self):
+    #     self.clf = pickle.load(open('SVM_stance_detection.model', 'rb'))
+    #     self.vector: TfidfVectorizer = pickle.load(
+    #         open('vector_stance_detection.pkl', 'rb'))
+
+    def __predict(self, text):
         a = self.vector.transform([text])
         predicted = self.clf.predict(a)
         predicedProb = self.clf.predict_proba(
             a)[0][0] + self.clf.predict_proba(a)[0][1]
         return predicedProb
 
+    def getStanceDetectionScore(self, text):
+        text = re.sub('[^a-zA-Z ]', '', text).lower()
+        text = ' '.join(
+            [w for w in text.split() if w not in stopwords.words('english')])
+        return self.__predict(text)
 
-def getStanceDetectionScore(text):
-    text = re.sub('[^a-zA-Z ]', '', text).lower()
-    text = ' '.join(
-        [w for w in text.split() if w not in stopwords.words('english')])
-    return StanceDetection().predict(text)
+# def getStanceDetectionScore(text):
+#     text = re.sub('[^a-zA-Z ]', '', text).lower()
+#     text = ' '.join(
+#         [w for w in text.split() if w not in stopwords.words('english')])
+#     return StanceDetection().predict(text)
 
 # getStanceDetectionScore("hey man how are you?")
 
