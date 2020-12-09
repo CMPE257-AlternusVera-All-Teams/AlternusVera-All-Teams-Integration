@@ -10,18 +10,12 @@ Original file is located at
 import pandas as pd
 import numpy as np
 import re
-# import sys
-# import random
-# import argparse
 import pickle
-# from collections import defaultdict
-# from csv import DictReader
 from tqdm import tqdm
 from sklearn import feature_extraction
 import xgboost as xgb
 import statistics
 from gensim.models.doc2vec import TaggedDocument
-# stop words are, is, the etc. which are not needed for model
 import nltk
 nltk.download("stopwords") 
 
@@ -227,8 +221,7 @@ class StanceDitectionFeature():
 
     def __generate_fn_features(self, dataset, name):
         h, b = [], []
- # base_path = '/content/drive/MyDrive/MLFall2020/the-feature-finders/AlternusVera/Stance/'
-
+ 
         for d in dataset:
             h.append(d[0])  # title
             b.append(d[1])  # text
@@ -255,10 +248,6 @@ class StanceDitectionFeature():
         fn_dataset = fn_dataset.values
 
         X_fn = self.__generate_fn_features(fn_dataset, "StanceFeature")
-
-# # Load the best classifier saved model
-# readfile = open('/content/drive/MyDrive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/stance-model-GBC', 'rb')
-# best_clf = pickle.load(readfile)
 
         self.fn_predicted = [self.LABELS[int(a)]
                              for a in self.bestModel.predict(X_fn)]
@@ -329,14 +318,6 @@ class ReliableSource():
     def FeatureFinders_getReliabilityBySource(self, src):
         x = self.__FeatureFinders_getSourceReliabilityScore(src)
         xTrain = np.array(x).reshape(-1, 1)
-
-#			readfile = open('/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/ReliableSourceLabelmodel', 'rb')
-#			best_clf = pickle.load(readfile)
-#			xPpredicted = best_clf.predict(xTrain)
-#			print(xPpredicted)
-#			xPredicedProb = best_clf.predict_proba(xTrain)[:,1]
-#			#xPredicedProb = best_clf.predict_proba(xTrain)
-#			#print(xPredicedProb)
 
         xPpredicted = self.model.predict(xTrain)
         xPredicedProb = self.model.predict_proba(xTrain)[:, 1]
@@ -421,41 +402,24 @@ class ToxicityFeature():
 
         all_text = self.__label_sentences(all_text, "Test")
 
-#        dbowfile = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/model_dbow', 'rb')
-#        model_dbow = pickle.load(dbowfile)
-
         # Doc2Vec
         test1_vectors_dbow = self.__get_vectors(
             self.model, len(all_text), 300, 'Test')
 
         # best Model for toxicity prediction
-#        toxicityModel_file = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/toxicity-model', 'rb')
-#        best_clf = pickle.load(toxicityModel_file)
-
         # predictions
         predictedToxicity = self.bestModel.predict(test1_vectors_dbow)
         predictedToxicity = set(predictedToxicity)
         predictedToxicity = statistics.mean(predictedToxicity)
 
-#        predictedToxicity = best_clf.predict(test1_vectors_dbow)
-#        predictedToxicity = set(predictedToxicity)
-#        predictedToxicity = statistics.mean(predictedToxicity)
         #predicedProb = best_clf.predict_proba(test1_vectors_dbow)[:,1]
         # print(predictedToxicity)
 
         # best Model for fakenews prediction
-#        toxicityLabel_file = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/toxicityFakenewsLabel-model', 'rb')
-#        best_labelclf = pickle.load(toxicityLabel_file)
 
         predictedFakeNews = self.fakeNewsmodel.predict(predictedToxicity)
         predicedProb = self.fakeNewsmodel.predict_proba(predictedToxicity)[
             :, 0]
-
-#        predictedFakeNews = best_labelclf.predict(predictedToxicity)
-#        predicedProb = best_labelclf.predict_proba(predictedToxicity)[:, 0]
 
         # print(predictedFakeNews)
         # print(predicedProb)
@@ -1136,11 +1100,6 @@ from functools import reduce
 
 class Word2VecFeatureGenerator(FeatureGenerator):
 
-#    def __load(self, path):
-#        with open(path, 'rb') as file:
-#            return pickle.load(file)
-#    model = gensim.models.KeyedVectors.load_word2vec_format("/content/drive/My Drive/MLFall2020/the-feature-finders/datasets/fakenewschallenge/GoogleNews-vectors-negative300.bin", binary=True)
-
     def __init__(self, gensim, name='word2vecFeatureGenerator'):
         super(Word2VecFeatureGenerator, self).__init__(name)
         self.modelGensim = gensim
@@ -1176,7 +1135,6 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         # word vectors weighted by normalized tf-idf coefficient?
         #headlineVec = [0]
 
-#        headlineVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Headline_unigram_array))
         headlineVec = list(map(lambda x: reduce(np.add, [self.modelGensim[y] for y in x if y in self.modelGensim], [0.]*300), Headline_unigram_array))
         headlineVec = np.array(headlineVec)
         #print('headlineVec:')
@@ -1426,10 +1384,6 @@ class SentimentFeatureGenerator(FeatureGenerator):
 
 
 # ----------------- TitleVsBody ------------------ #
-# imports
-# team_features-finders-factor_title_vs_body.py
-# from team_features_finders_factor_title_vs_body import TitleVsBody as tvb
-
 
 class TitleVsBody():
 
@@ -1437,13 +1391,6 @@ class TitleVsBody():
         self.modelLog = self.__load(filenameModelLog)
         self.modelXgb = self.__load(filenameModelXgb)
         self.modelGensim = gensimModel
-
-#        self.bestModel = self.__load(filenameBestModel)
-#        self.base_path = base_path
-#    model_path = "/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/"
-#    file_name = "titlevsbody_logistic_proba.pkl"
-#    titlevsbody_logistic_proba = pickle.load(open(model_path + file_name, "rb"))
-
 
     def __load(self, path):
         with open(path, 'rb') as file:
@@ -1549,12 +1496,6 @@ class TitleVsBody():
         # dtrain = xgb.DMatrix(data_x, label=data_y, weight=w)
         dtest = xgb.DMatrix(test_x)
 
-#        # load model
-#       model_path = "/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/"
-#       file_name = "titlevsbody_xgboost.pkl"
-#       bst = pickle.load(open(model_path + file_name, "rb"))
-#       #print('bst type:', type(bst))
-
         pred = self.modelXgb.predict(dtest)
         pred_prob_y = pred.reshape(test_x.shape[0], 4)
         pred_prob_y = self.modelXgb.predict(dtest).reshape(test_x.shape[0], 4)
@@ -1569,9 +1510,6 @@ class TitleVsBody():
         return pred_y
 
     def FeatureFinders_getTitleVsBodyScore(self, val): # int val 0-3 of TitleVsBody labels
-#        # model_path = "/content/drive/My Drive/the-feature-finders/AlternusVera/pickled-model/"
-#        # file_name = "titlevsbody_logistic_proba.pkl"
-#        # titlevsbody_logistic_proba = pickle.load(open(model_path + file_name, "rb"))
         arr = np.array([val])
         return self.modelLog.predict_proba(arr.reshape(-1, 1))
 
