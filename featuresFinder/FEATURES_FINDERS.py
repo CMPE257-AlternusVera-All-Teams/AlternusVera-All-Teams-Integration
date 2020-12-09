@@ -18,6 +18,7 @@ import pickle
 # from csv import DictReader
 from tqdm import tqdm
 from sklearn import feature_extraction
+import xgboost as xgb
 import statistics
 from gensim.models.doc2vec import TaggedDocument
 # stop words are, is, the etc. which are not needed for model
@@ -1428,7 +1429,6 @@ class SentimentFeatureGenerator(FeatureGenerator):
 # team_features-finders-factor_title_vs_body.py
 # from team_features_finders_factor_title_vs_body import TitleVsBody as tvb
 
-# import xgboost as xgb
 
 class TitleVsBody():
 
