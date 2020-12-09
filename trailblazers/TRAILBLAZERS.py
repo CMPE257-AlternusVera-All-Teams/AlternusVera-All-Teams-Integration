@@ -359,7 +359,6 @@ def predictLable(text):
 
   src=speaker_map.get(res)
 
-  print(src)  
   # print(df_test)
   for key in speaker_map:
     if speaker_map[key] == src:
