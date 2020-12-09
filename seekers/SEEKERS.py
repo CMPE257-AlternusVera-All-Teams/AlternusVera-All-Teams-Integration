@@ -68,7 +68,7 @@ class Seekers_StanceDetection():
         result=0.8
     return result
 
-#print("op ", Seekers_StanceDetection("randomforest.sav").predict("text here"))
+print("op ", Seekers_StanceDetection("randomforest.sav").predict("text here"))
 
 
 
@@ -154,7 +154,7 @@ class Seekers_ClickBait():
     probValue = self.multinomialModel.predict_proba(train_arr)[:,1][0]
     return probValue
 
-#print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
+print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
 
 
 
