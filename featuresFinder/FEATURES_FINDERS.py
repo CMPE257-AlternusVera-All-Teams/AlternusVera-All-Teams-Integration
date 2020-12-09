@@ -34,186 +34,186 @@ class StanceDitectionFeature():
 
     # _wnl = nltk.WordNetLemmatizer()
 
-    # def gen_or_load_feats(self,feat_fn, headlines, bodies, feature_file):
-    #   feats = feat_fn(headlines, bodies)
-    #   np.save(feature_file, feats)
-    #   return np.load(feature_file)
+    def gen_or_load_feats(self,feat_fn, headlines, bodies, feature_file):
+      feats = feat_fn(headlines, bodies)
+      np.save(feature_file, feats)
+      return np.load(feature_file)
 
-    # def normalize_word(self,w):
-    #     return self._wnl.lemmatize(w).lower()
+    def normalize_word(self,w):
+        return self._wnl.lemmatize(w).lower()
 
-    # def get_tokenized_lemmas(self,s):
-    #     return [self.normalize_word(t) for t in nltk.word_tokenize(s)]
+    def get_tokenized_lemmas(self,s):
+        return [self.normalize_word(t) for t in nltk.word_tokenize(s)]
 
-    # def clean(self,s):
-    #     # Cleans a string: Lowercasing, trimming, removing non-alphanumeric
-    #     return " ".join(re.findall(r'\w+', s, flags=re.UNICODE)).lower()
+    def clean(self,s):
+        # Cleans a string: Lowercasing, trimming, removing non-alphanumeric
+        return " ".join(re.findall(r'\w+', s, flags=re.UNICODE)).lower()
 
-    # def remove_stopwords(self,l):
-    #     # Removes stopwords from a list of tokens
-    #     return [w for w in l if w not in feature_extraction.text.ENGLISH_STOP_WORDS]
+    def remove_stopwords(self,l):
+        # Removes stopwords from a list of tokens
+        return [w for w in l if w not in feature_extraction.text.ENGLISH_STOP_WORDS]
 
-    # def word_overlap_features(self,headlines, bodies):
-    #   X = []
-    #   for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
-    #       clean_headline = self.clean(headline)
-    #       clean_body = self.clean(body)
-    #       clean_headline = self.get_tokenized_lemmas(clean_headline)
-    #       clean_body = self.get_tokenized_lemmas(clean_body)
-    #       features = [
-    #           len(set(clean_headline).intersection(clean_body)) / float(len(set(clean_headline).union(clean_body)))]
-    #       X.append(features)
-    #       i = i+1
-    #   return X
+    def word_overlap_features(self,headlines, bodies):
+      X = []
+      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+          clean_headline = self.clean(headline)
+          clean_body = self.clean(body)
+          clean_headline = self.get_tokenized_lemmas(clean_headline)
+          clean_body = self.get_tokenized_lemmas(clean_body)
+          features = [
+              len(set(clean_headline).intersection(clean_body)) / float(len(set(clean_headline).union(clean_body)))]
+          X.append(features)
+          i = i+1
+      return X
 
-    # def refuting_features(self,headlines, bodies):
-    #   _refuting_words = [
-    #       'fake',
-    #       'fraud',
-    #       'hoax',
-    #       'false',
-    #       'deny', 'denies',
-    #       'not',
-    #       'despite',
-    #       'nope',
-    #       'doubt', 'doubts',
-    #       'bogus',
-    #       'debunk',
-    #       'pranks',
-    #       'retract'
-    #   ]
-    #   X = []
-    #   for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
-    #       clean_headline = self.clean(headline)
-    #       clean_headline = self.get_tokenized_lemmas(clean_headline)
-    #       features = [1 if word in clean_headline else 0 for word in _refuting_words]
-    #       X.append(features)
-    #   return X
+    def refuting_features(self,headlines, bodies):
+      _refuting_words = [
+          'fake',
+          'fraud',
+          'hoax',
+          'false',
+          'deny', 'denies',
+          'not',
+          'despite',
+          'nope',
+          'doubt', 'doubts',
+          'bogus',
+          'debunk',
+          'pranks',
+          'retract'
+      ]
+      X = []
+      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+          clean_headline = self.clean(headline)
+          clean_headline = self.get_tokenized_lemmas(clean_headline)
+          features = [1 if word in clean_headline else 0 for word in _refuting_words]
+          X.append(features)
+      return X
 
-    # def polarity_features(self,headlines, bodies):
-    #   _refuting_words = [
-    #       'fake',
-    #       'fraud',
-    #       'hoax',
-    #       'false',
-    #       'deny', 'denies',
-    #       'not',
-    #       'despite',
-    #       'nope',
-    #       'doubt', 'doubts',
-    #       'bogus',
-    #       'debunk',
-    #       'pranks',
-    #       'retract'
-    #   ]
+    def polarity_features(self,headlines, bodies):
+      _refuting_words = [
+          'fake',
+          'fraud',
+          'hoax',
+          'false',
+          'deny', 'denies',
+          'not',
+          'despite',
+          'nope',
+          'doubt', 'doubts',
+          'bogus',
+          'debunk',
+          'pranks',
+          'retract'
+      ]
 
-    #   def calculate_polarity(text):
-    #       tokens = self.get_tokenized_lemmas(text)
-    #       return sum([t in _refuting_words for t in tokens]) % 2
-    #   X = []
-    #   for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
-    #       clean_headline = self.clean(headline)
-    #       clean_body = self.clean(body)
-    #       features = []
-    #       features.append(calculate_polarity(clean_headline))
-    #       features.append(calculate_polarity(clean_body))
-    #       X.append(features)
-    #   return np.array(X)
+      def calculate_polarity(text):
+          tokens = self.get_tokenized_lemmas(text)
+          return sum([t in _refuting_words for t in tokens]) % 2
+      X = []
+      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+          clean_headline = self.clean(headline)
+          clean_body = self.clean(body)
+          features = []
+          features.append(calculate_polarity(clean_headline))
+          features.append(calculate_polarity(clean_body))
+          X.append(features)
+      return np.array(X)
 
-    # def ngrams(self,input, n):
-    #   input = input.split(' ')
-    #   output = []
-    #   for i in range(len(input) - n + 1):
-    #       output.append(input[i:i + n])
-    #   return output
+    def ngrams(self,input, n):
+      input = input.split(' ')
+      output = []
+      for i in range(len(input) - n + 1):
+          output.append(input[i:i + n])
+      return output
 
-    # def chargrams(self,input, n):
-    #     output = []
-    #     for i in range(len(input) - n + 1):
-    #         output.append(input[i:i + n])
-    #     return output
+    def chargrams(self,input, n):
+        output = []
+        for i in range(len(input) - n + 1):
+            output.append(input[i:i + n])
+        return output
 
-    # def append_chargrams(self,features, text_headline, text_body, size):
-    #   grams = [' '.join(x) for x in self.chargrams(" ".join(self.remove_stopwords(text_headline.split())), size)]
-    #   grams_hits = 0
-    #   grams_early_hits = 0
-    #   grams_first_hits = 0
-    #   for gram in grams:
-    #       if gram in text_body:
-    #           grams_hits += 1
-    #       if gram in text_body[:255]:
-    #           grams_early_hits += 1
-    #       if gram in text_body[:100]:
-    #           grams_first_hits += 1
-    #   features.append(grams_hits)
-    #   features.append(grams_early_hits)
-    #   features.append(grams_first_hits)
-    #   return features
+    def append_chargrams(self,features, text_headline, text_body, size):
+      grams = [' '.join(x) for x in self.chargrams(" ".join(self.remove_stopwords(text_headline.split())), size)]
+      grams_hits = 0
+      grams_early_hits = 0
+      grams_first_hits = 0
+      for gram in grams:
+          if gram in text_body:
+              grams_hits += 1
+          if gram in text_body[:255]:
+              grams_early_hits += 1
+          if gram in text_body[:100]:
+              grams_first_hits += 1
+      features.append(grams_hits)
+      features.append(grams_early_hits)
+      features.append(grams_first_hits)
+      return features
 
-    # def append_ngrams(self,features, text_headline, text_body, size):
-    #     grams = [' '.join(x) for x in self.ngrams(text_headline, size)]
-    #     grams_hits = 0
-    #     grams_early_hits = 0
-    #     for gram in grams:
-    #         if gram in text_body:
-    #             grams_hits += 1
-    #         if gram in text_body[:255]:
-    #             grams_early_hits += 1
-    #     features.append(grams_hits)
-    #     features.append(grams_early_hits)
-    #     return features
+    def append_ngrams(self,features, text_headline, text_body, size):
+        grams = [' '.join(x) for x in self.ngrams(text_headline, size)]
+        grams_hits = 0
+        grams_early_hits = 0
+        for gram in grams:
+            if gram in text_body:
+                grams_hits += 1
+            if gram in text_body[:255]:
+                grams_early_hits += 1
+        features.append(grams_hits)
+        features.append(grams_early_hits)
+        return features
 
-    # def hand_features(self,headlines, bodies):
+    def hand_features(self,headlines, bodies):
 
-    #   def binary_co_occurence(headline, body):
-    #       # Count how many times a token in the title
-    #       # appears in the body text.
-    #       bin_count = 0
-    #       bin_count_early = 0
-    #       for headline_token in self.clean(headline).split(" "):
-    #           if headline_token in self.clean(body):
-    #               bin_count += 1
-    #           if headline_token in self.clean(body)[:255]:
-    #               bin_count_early += 1
-    #       return [bin_count, bin_count_early]
+      def binary_co_occurence(headline, body):
+          # Count how many times a token in the title
+          # appears in the body text.
+          bin_count = 0
+          bin_count_early = 0
+          for headline_token in self.clean(headline).split(" "):
+              if headline_token in self.clean(body):
+                  bin_count += 1
+              if headline_token in self.clean(body)[:255]:
+                  bin_count_early += 1
+          return [bin_count, bin_count_early]
 
-    #   def binary_co_occurence_stops(headline, body):
-    #       # Count how many times a token in the title
-    #       # appears in the body text. Stopwords in the title
-    #       # are ignored.
-    #       bin_count = 0
-    #       bin_count_early = 0
-    #       for headline_token in self.remove_stopwords(self.clean(headline).split(" ")):
-    #           if headline_token in self.clean(body):
-    #               bin_count += 1
-    #               bin_count_early += 1
-    #       return [bin_count, bin_count_early]
+      def binary_co_occurence_stops(headline, body):
+          # Count how many times a token in the title
+          # appears in the body text. Stopwords in the title
+          # are ignored.
+          bin_count = 0
+          bin_count_early = 0
+          for headline_token in self.remove_stopwords(self.clean(headline).split(" ")):
+              if headline_token in self.clean(body):
+                  bin_count += 1
+                  bin_count_early += 1
+          return [bin_count, bin_count_early]
 
-    #   def count_grams(headline, body):
-    #       # Count how many times an n-gram of the title
-    #       # appears in the entire body, and intro paragraph
+      def count_grams(headline, body):
+          # Count how many times an n-gram of the title
+          # appears in the entire body, and intro paragraph
 
-    #       clean_body = self.clean(body)
-    #       clean_headline = self.clean(headline)
-    #       features = []
-    #       features = self.append_chargrams(features, clean_headline, clean_body, 2)
-    #       features = self.append_chargrams(features, clean_headline, clean_body, 8)
-    #       features = self.append_chargrams(features, clean_headline, clean_body, 4)
-    #       features = self.append_chargrams(features, clean_headline, clean_body, 16)
-    #       features = self.append_ngrams(features, clean_headline, clean_body, 2)
-    #       features = self.append_ngrams(features, clean_headline, clean_body, 3)
-    #       features = self.append_ngrams(features, clean_headline, clean_body, 4)
-    #       features = self.append_ngrams(features, clean_headline, clean_body, 5)
-    #       features = self.append_ngrams(features, clean_headline, clean_body, 6)
-    #       return features
+          clean_body = self.clean(body)
+          clean_headline = self.clean(headline)
+          features = []
+          features = self.append_chargrams(features, clean_headline, clean_body, 2)
+          features = self.append_chargrams(features, clean_headline, clean_body, 8)
+          features = self.append_chargrams(features, clean_headline, clean_body, 4)
+          features = self.append_chargrams(features, clean_headline, clean_body, 16)
+          features = self.append_ngrams(features, clean_headline, clean_body, 2)
+          features = self.append_ngrams(features, clean_headline, clean_body, 3)
+          features = self.append_ngrams(features, clean_headline, clean_body, 4)
+          features = self.append_ngrams(features, clean_headline, clean_body, 5)
+          features = self.append_ngrams(features, clean_headline, clean_body, 6)
+          return features
 
-    #   X = []
-    #   for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
-    #       X.append(binary_co_occurence(headline, body)
-    #                + binary_co_occurence_stops(headline, body)
-    #                + count_grams(headline, body))
+      X = []
+      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+          X.append(binary_co_occurence(headline, body)
+                   + binary_co_occurence_stops(headline, body)
+                   + count_grams(headline, body))
 
-    #   return X
+      return X
 
     ###
     LABELS = ['agree', 'disagree', 'discuss', 'unrelated']
