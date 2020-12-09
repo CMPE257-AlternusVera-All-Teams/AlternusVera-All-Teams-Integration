@@ -340,10 +340,6 @@ def predictLable(text):
        'NNP', 'NNPS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP',
        'SYM', 'TO', 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP',
        'WP$', 'WRB'])
-  
-
-  cwd = os.getcwd()
-  print(cwd)
 
   with open('/content/AlternusVera-All-Teams-Integration/trailblazers/knn_speaker_Model.pkl', 'rb') as file:  
     knn_speaker_Model = pickle.load(file)
