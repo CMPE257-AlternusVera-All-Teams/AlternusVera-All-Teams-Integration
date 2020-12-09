@@ -24,15 +24,15 @@ from nltk.corpus import stopwords
 import re
 import numpy as np
 import pandas as pd
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-from google.colab import auth
-from oauth2client.client import GoogleCredentials
+# from pydrive.auth import GoogleAuth
+# from pydrive.drive import GoogleDrive
+# from google.colab import auth
+# from oauth2client.client import GoogleCredentials
 # Authenticate and create the PyDrive client.
-auth.authenticate_user()
-gauth = GoogleAuth()
-gauth.credentials = GoogleCredentials.get_application_default()
-drive = GoogleDrive(gauth)
+# auth.authenticate_user()
+# gauth = GoogleAuth()
+# gauth.credentials = GoogleCredentials.get_application_default()
+# drive = GoogleDrive(gauth)
 
 """## Import Libraries"""
 
@@ -107,70 +107,78 @@ class StanceDetection():
 
 """## Clickbait Detection"""
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/16norntMWxj2ljjRY8UtFpyhtd2teEYJe/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('RF_clickbait.model')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/16norntMWxj2ljjRY8UtFpyhtd2teEYJe/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('RF_clickbait.model')
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/1wEXHnjj0yAeTKJmj-noUIKFqhrMuHpwT/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('vector_clickbait.pkl')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/1wEXHnjj0yAeTKJmj-noUIKFqhrMuHpwT/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('vector_clickbait.pkl')
 
 
 class Clickbait():
 
-    def __init__(self):
-        self.clf = pickle.load(open('RF_clickbait.model', 'rb'))
+    def __init__(self, filenameModel, filenamePkl):
+        self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
-            open('vector_clickbait.pkl', 'rb'))
+            open(filenamePkl, 'rb'))
 
-    def predict(self, text):
+    # def __init__(self):
+    #     self.clf = pickle.load(open('RF_clickbait.model', 'rb'))
+    #     self.vector: TfidfVectorizer = pickle.load(
+    #         open('vector_clickbait.pkl', 'rb'))
+
+    def __predict(self, text):
         a = self.vector.transform([text])
         predicted = self.clf.predict(a)
         predicedProb = self.clf.predict_proba(
             a)[0][0] + self.clf.predict_proba(a)[0][1]
         return predicedProb
 
-
-def getClickbaitScore(text):
-    text = re.sub('[^a-zA-Z ]', '', text).lower()
-    text = ' '.join(
-        [w for w in text.split() if w not in stopwords.words('english')])
-    return Clickbait().predict(text)
+    def getClickbaitScore(self, text):
+        text = re.sub('[^a-zA-Z ]', '', text).lower()
+        text = ' '.join(
+            [w for w in text.split() if w not in stopwords.words('english')])
+        return self.__predict(text)
 
 # getClickbaitScore("Should You bring the money now")
 
 
 """## News Coverage"""
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/1AKTM3HyxsC0uKfzVKsNdc_JQ5TXnjbht/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('RF_news_coverage.model')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/1AKTM3HyxsC0uKfzVKsNdc_JQ5TXnjbht/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('RF_news_coverage.model')
 
-temp_drive = drive.CreateFile(
-    {'id': 'https://drive.google.com/file/d/1VAZF05pt59sYNjY4siLrkHY1208cf3rS/view?usp=sharing'.split('/')[-2]})
-temp_drive.GetContentFile('vector_news_coverage.pkl')
+# temp_drive = drive.CreateFile(
+#     {'id': 'https://drive.google.com/file/d/1VAZF05pt59sYNjY4siLrkHY1208cf3rS/view?usp=sharing'.split('/')[-2]})
+# temp_drive.GetContentFile('vector_news_coverage.pkl')
 
 
 class NewsCoverage():
 
-    def __init__(self):
-        self.clf = pickle.load(open('RF_news_coverage.model', 'rb'))
+    def __init__(self, filenameModel, filenamePkl):
+        self.clf = pickle.load(open(filenameModel, 'rb'))
         self.vector: TfidfVectorizer = pickle.load(
-            open('vector_news_coverage.pkl', 'rb'))
+            open(filenamePkl, 'rb'))
 
-    def predict(self, text):
+    # def __init__(self):
+    #     self.clf = pickle.load(open('RF_news_coverage.model', 'rb'))
+    #     self.vector: TfidfVectorizer = pickle.load(
+    #         open('vector_news_coverage.pkl', 'rb'))
+
+    def __predict(self, text):
         a = self.vector.transform([text])
         #predicted = self.clf.predict(a)
         predicedProb = self.clf.predict_proba(
             a)[0][0] + self.clf.predict_proba(a)[0][1]
         return predicedProb
 
-
-def getNewsCoverageScore(text):
-    text = re.sub('[^a-zA-Z ]', '', text).lower()
-    text = ' '.join(
-        [w for w in text.split() if w not in stopwords.words('english')])
-    return NewsCoverage().predict(text)
+    def getNewsCoverageScore(self, text):
+        text = re.sub('[^a-zA-Z ]', '', text).lower()
+        text = ' '.join(
+            [w for w in text.split() if w not in stopwords.words('english')])
+        return self.__predict(text)
 
 # getNewsCoverageScore("Donald trump will win")
 
@@ -180,25 +188,30 @@ def getNewsCoverageScore(text):
 
 class WritingStyle():
 
-    def __init__(self):
-        temp_writtingStyle_drive = drive.CreateFile(
-            {'id': 'https://drive.google.com/file/d/1iRZvUoFB6nRp0LNtyzDNYOFtNxF8Szxs/view?usp=sharing'.split('/')[-2]})
-        temp_writtingStyle_drive.GetContentFile('writting_style.pkl')
-        self.clf = pickle.load(open('writting_style.pkl', 'rb'))
+    def __init__(self, filenamePkl):
+        self.clf = pickle.load(open(filenamePkl, 'rb'))
 
-    def predict(self, text):
+    # def __init__(self):
+    #     temp_writtingStyle_drive = drive.CreateFile(
+    #         {'id': 'https://drive.google.com/file/d/1iRZvUoFB6nRp0LNtyzDNYOFtNxF8Szxs/view?usp=sharing'.split('/')[-2]})
+    #     temp_writtingStyle_drive.GetContentFile('writting_style.pkl')
+    #     self.clf = pickle.load(open('writting_style.pkl', 'rb'))
+
+    def __predict(self, text):
         predicted = self.clf.predict([text])
         predicedProb = self.clf.predict_proba([text])[:, 1]
-
         return bool(predicted), float(predicedProb)
 
+    # return between 0 and 1, being 0 = True,  1 = Fake
+    def WritingStyleScore(self, text):
+        binaryValue, probValue = self.__predict(text)
+        return (1 - float(probValue))
 
-writingstyle = WritingStyle()
+# writingstyle = WritingStyle()
 
-
-def WritingStyleScore(text):  # return between 0 and 1, being 0 = True,  1 = Fake
-    binaryValue, probValue = writingstyle.predict(text)
-    return (1 - float(probValue))
+# def WritingStyleScore(text):  # return between 0 and 1, being 0 = True,  1 = Fake
+#     binaryValue, probValue = writingstyle.predict(text)
+#     return (1 - float(probValue))
 
 # print(WritingStyleScore("College Republicans, YAF Sue Berkeley over Ann Coulter Event - Breitbart"))
 
