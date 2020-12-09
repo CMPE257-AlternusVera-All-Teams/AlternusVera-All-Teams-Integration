@@ -347,7 +347,7 @@ def predictLable(text):
   cwd = os.getcwd()
   print(cwd)
 
-  with open('.knn_speaker_Model.pkl', 'rb') as file:  
+  with open('./knn_speaker_Model.pkl', 'rb') as file:  
     knn_speaker_Model = pickle.load(file)
   
   # print(spearker_df)
