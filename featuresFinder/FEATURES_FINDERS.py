@@ -22,15 +22,16 @@ import xgboost as xgb
 import statistics
 from gensim.models.doc2vec import TaggedDocument
 # stop words are, is, the etc. which are not needed for model
-from nltk.corpus import stopwords
-from nltk.corpus import words
-from textblob import TextBlob, Word
-
 import nltk
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('vader_lexicon')
 nltk.download("stopwords") 
+
+from nltk.corpus import stopwords
+from nltk.corpus import words
+from textblob import TextBlob, Word
+
 
 
 
