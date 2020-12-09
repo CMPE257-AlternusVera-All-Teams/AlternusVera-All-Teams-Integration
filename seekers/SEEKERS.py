@@ -16,37 +16,11 @@ from string import punctuation
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
-<<<<<<< HEAD
 nltk.download('wordnet')
-=======
->>>>>>> 7877d50d03f6add9bc619259d160dc5ee9e92de0
 import string
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 stemmer = SnowballStemmer('english')
 
-<<<<<<< HEAD
-=======
-# nltk.download('wordnet')
-#from pydrive.auth import GoogleAuth
-#from pydrive.drive import GoogleDrive
-#from google.colab import auth
-#from oauth2client.client import GoogleCredentials
-
-"""Fetching the model from github:   
-Random Forest produced best result 
-"""
-
-# import requests, zipfile, io
-# def download_url(url, save_path, chunk_size=128):
-#     r = requests.get(url)
-#     z = zipfile.ZipFile(io.BytesIO(r.content))
-#     z.extractall(save_path)
-
-# download_url('https://github.com/jrangu/Datasets/blob/master/randomforest.zip?raw=true', '/content/')
-
-
-
->>>>>>> 7877d50d03f6add9bc619259d160dc5ee9e92de0
 """Loading the pickled model and predicting the score"""
 sw = stopwords.words('english')
 class Seekers_StanceDetection():
@@ -94,7 +68,7 @@ class Seekers_StanceDetection():
         result=0.8
     return result
 
-#print("op ", Seekers_StanceDetection("randomforest.sav").predict("text here"))
+print("op ", Seekers_StanceDetection("randomforest.sav").predict("text here"))
 
 
 
@@ -180,7 +154,7 @@ class Seekers_ClickBait():
     probValue = self.multinomialModel.predict_proba(train_arr)[:,1][0]
     return probValue
 
-#print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
+print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
 
 class Seekers_Spam():
 
