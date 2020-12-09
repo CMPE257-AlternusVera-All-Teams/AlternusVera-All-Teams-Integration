@@ -1172,7 +1172,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         #headlineVec = [0]
 
 #        headlineVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Headline_unigram_array))
-        headlineVec = list(map(lambda x: reduce(np.add, [self.modelGensim.model[y] for y in x if y in self.modelGensim.model], [0.]*300), Headline_unigram_array))
+        headlineVec = list(map(lambda x: reduce(np.add, [self.modelGensim[y] for y in x if y in self.modelGensim], [0.]*300), Headline_unigram_array))
         headlineVec = np.array(headlineVec)
         #print('headlineVec:')
         #print(headlineVec)
@@ -1206,7 +1206,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         #print(Body_unigram_array)
         #print(Body_unigram_array.shape)
         #bodyVec = [0]
-        bodyVec = list(map(lambda x: reduce(np.add, [self.modelGensim.model[y] for y in x if y in self.modelGensim.model], [0.]*300), Body_unigram_array))
+        bodyVec = list(map(lambda x: reduce(np.add, [self.modelGensim[y] for y in x if y in self.modelGensim], [0.]*300), Body_unigram_array))
         bodyVec = np.array(bodyVec)
         bodyVec = normalize(bodyVec)
         #print('bodyVec')
