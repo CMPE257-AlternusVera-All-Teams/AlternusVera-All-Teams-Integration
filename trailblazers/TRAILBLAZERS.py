@@ -169,7 +169,7 @@ def predictIntention(text):
 
     def get_sensational_score(df):
         # sensational_words = pd.read_csv('./sensational_words_dict.csv', usecols=[0], sep='\t+', header=None)
-        sensational_words = pd.read_csv('./sensational_words_dict.csv', usecols=[0], sep='\t+', header=None)
+        sensational_words = pd.read_csv('/content/AlternusVera-All-Teams-Integration/trailblazers/sensational_words_dict.csv', usecols=[0], sep='\t+', header=None)
         corpus = []
         corpus.append(text)
         sensational_corpus=[]
@@ -177,7 +177,7 @@ def predictIntention(text):
         sensational_corpus.append(sensational_dictionary)
         
         # sentic_net = pd.read_csv('./senticnet5.txt', sep="\t+", header=None, usecols=[0,1,2], names = ["Token", "Polarity", "Intensity"])
-        sentic_net = pd.read_csv('./senticnet5.txt', sep="\t+", header=None, usecols=[0,1,2], names = ["Token", "Polarity", "Intensity"])
+        sentic_net = pd.read_csv('/content/AlternusVera-All-Teams-Integration/trailblazers/senticnet5.txt', sep="\t+", header=None, usecols=[0,1,2], names = ["Token", "Polarity", "Intensity"])
         warnings.filterwarnings("ignore")
         sentic_net = sentic_net[~sentic_net['Token'].str.contains('|'.join('_'),na=False)]
         sentic_net = sentic_net.reset_index(drop=True)
@@ -271,7 +271,7 @@ def predictIntention(text):
                                'NNP','NNPS','PDT','POS','PRP','PRP$','RB','RBR','RBS','RP','SYM',
                                'TO','UH','VB','VBD','VBG','VBN','VBP','VBZ','WDT','WP','WP$','WRB'])
        
-    with open('./neural_net.pkl', 'rb') as file:  
+    with open('/content/AlternusVera-All-Teams-Integration/trailblazers/neural_net.pkl', 'rb') as file:  
     # with open('./neural_net.pkl', 'rb') as file:  
         neural_net_model = pickle.load(file)
 
@@ -347,7 +347,7 @@ def predictLable(text):
   cwd = os.getcwd()
   print(cwd)
 
-  with open('./knn_speaker_Model.pkl', 'rb') as file:  
+  with open('/content/AlternusVera-All-Teams-Integration/trailblazers/knn_speaker_Model.pkl', 'rb') as file:  
     knn_speaker_Model = pickle.load(file)
   
   # print(spearker_df)
@@ -367,7 +367,7 @@ def predictLable(text):
     if speaker_map[key] == src:
       df_test['Source_cat']=key
   
-  with open('./knn_truth_Model.pkl', 'rb') as file:  
+  with open('/content/AlternusVera-All-Teams-Integration/trailblazers/knn_truth_Model.pkl', 'rb') as file:  
     knn_truth_Model = pickle.load(file)
 
   source_df = df_test.filter(items=['Source_cat', 'CC', 'CD',
