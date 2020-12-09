@@ -167,24 +167,10 @@ class Seekers_Spam():
   def load(self, path):
     with open(path, 'rb') as file:
       return pickle.load(file)
-
-  def remove_stop_and_short_words(self,text):
-    text = [word.lower() for word in text.split() if (word.lower() not in sw) and (len(word)>3)]
-    return " ".join(text)
-  
-  def lemmatize_stemming(self,text):
-    return stemmer.stem(WordNetLemmatizer().lemmatize(text, pos='v'))
-  
-  def remove_punctuation(self,text):
-    translator = str.maketrans('', '', string.punctuation)
-    return text.translate(translator)
     
   def tokenization(self,text):
     lst=text.split()
     return lst
-  
-  def process_data(self,text):
-    return loaded_tdIdfModel.transform(text)
 
   def predict(self, text):
     dfrme = pd.DataFrame(index=[0], columns=['text'])
@@ -192,9 +178,7 @@ class Seekers_Spam():
     predict=dfrme['text'].apply(self.tokenization)
     predict = predict.apply(lambda x: ''.join(i+' ' for i in x))
     text = self.loaded_tdIdfModel.transform(predict)
-    # processedText = self.process_data(dfrme['text'])
     result = self.loaded_model.predict_proba(text.toarray())[:,1][0]
-    # print(result)
     return result
 
 #print('op ', Seekers_Spam('TFidfvectorizer.sav','final_SpamModel.sav').predict('text here'))
