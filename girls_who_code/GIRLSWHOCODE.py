@@ -7,6 +7,9 @@ Original file is located at
     https://colab.research.google.com/drive/1gxwoiBlbXvC4Qehnx07hlIG_ju37H_dh
 """
 
+import pickle
+import pandas as pd
+
 class Topics_with_LDA_Bigram: 
 
   def __init__(self, filenameModelLog): 
