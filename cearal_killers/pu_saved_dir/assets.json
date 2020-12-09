@@ -1,0 +1,1 @@
+{"label_columns": ["label"], "label_shapes": [2], "problem_types": ["classification"], "feature_columns": ["text"]}
