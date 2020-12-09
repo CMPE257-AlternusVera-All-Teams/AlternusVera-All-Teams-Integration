@@ -31,9 +31,8 @@ import requests
 stop_words = set(stopwords.words('english'))
 import os
 
-def predictIntention(text):
+def predictIntention(text, model):
     def cleaning(statement):
-        import nltk
         
         # 1. Remove non-letters/Special Characters and Punctuations
         news = re.sub("[^a-zA-Z]", " ", statement)
@@ -59,9 +58,8 @@ def predictIntention(text):
         # 8. Join the stemmed words back into one string separated by space, and return the result.
         return " ".join(stems)
 
-    def clean_spell_checker(df):
+    def clean_spell_checker(df, model):
       
-        model = gensim.models.KeyedVectors.load_word2vec_format('https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz', binary=True)
         words = model.index2word
         w_rank = {}
         for i,word in enumerate(words):
@@ -113,9 +111,9 @@ def predictIntention(text):
         return df
         
     cleaned_word = []
-    def clean(df):
+    def clean(df, model):
         df['clean'] = df['clean'].apply(cleaning)
-        df = clean_spell_checker(df) 
+        df = clean_spell_checker(df, model) 
         return df
 
 
@@ -260,7 +258,7 @@ def predictIntention(text):
 
 
     df_data = pd.DataFrame([[text,0]],columns=['clean', 'index'])
-    df_data = clean(df_data)
+    df_data = clean(df_data, model)
     df_data = sentiment_analysis(df_data)
     df_data = get_sensational_score(df_data)
     df_data = get_lda_score(df_data)
