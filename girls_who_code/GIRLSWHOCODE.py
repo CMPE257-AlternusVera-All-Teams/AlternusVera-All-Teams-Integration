@@ -19,7 +19,7 @@ class Topics_with_LDA_Bigram:
       with open(path, 'rb') as file:
           return pickle.load(file) 
 
-  def encodeLabel(df):
+  def encodeLabel(self, df):
     df.Label[df.Label == 'FALSE'] = 0
     df.Label[df.Label == 'half-true'] = 1
     df.Label[df.Label == 'mostly-true'] = 1
@@ -28,7 +28,7 @@ class Topics_with_LDA_Bigram:
     df.Label[df.Label == 'pants-fire'] = 0
     return df
 
-  def sent_to_words(sentences):
+  def sent_to_words(self, sentences):
     # Gensim
     import gensim
     import gensim.corpora as corpora
@@ -37,7 +37,7 @@ class Topics_with_LDA_Bigram:
     for sentence in sentences:
         yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))  # deacc=True removes punctuations
 
-  def data_preprocess(df):
+  def data_preprocess(self, df):
     import re
     dt_processed = df.News.values.tolist()
     # Remove new line characters
@@ -47,7 +47,7 @@ class Topics_with_LDA_Bigram:
     return data_words_processed
   
     # Define functions for stopwords, bigrams, trigrams and lemmatization
-  def remove_stopwords(texts):
+  def remove_stopwords(self, texts):
     from nltk.corpus import stopwords
     from gensim.utils import simple_preprocess
     import nltk
@@ -56,7 +56,7 @@ class Topics_with_LDA_Bigram:
     stop_words.extend(['from', 'subject', 're', 'edu', 'use'])
     return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
 
-  def lemmatization(texts):
+  def lemmatization(self, texts):
     # spacy for lemmatization
     import spacy
     """https://spacy.io/api/annotation"""
@@ -67,18 +67,18 @@ class Topics_with_LDA_Bigram:
         texts_out.append([token.lemma_ for token in doc])
     return texts_out
 
-  def extract_bigrams(data):
+  def extract_bigrams(self, data):
     from nltk.util import ngrams
     n_grams = ngrams(data, 2)
     return ['_'.join(grams) for grams in n_grams]    
 
-  def create_bigrams():
+  def create_bigrams(self):
     Bigrams = []
     for i in range(len(data_words_processed)):
       Bigrams.append(Topics_with_LDA_Bigram.extract_bigrams(data_words_processed[i]))
     return Bigrams    
 
-  def lda_model_final(corpus, id2word):
+  def lda_model_final(self, corpus, id2word):
     # Gensim
     import gensim
     import gensim.corpora as corpora
@@ -96,7 +96,7 @@ class Topics_with_LDA_Bigram:
                                            per_word_topics=True)
     return lda_model_bigram_scrapped  
 
-  def format_topics_sentences(ldamodel, corpus, texts):
+  def format_topics_sentences(self, ldamodel, corpus, texts):
     import pandas as pd
     # Init output
     sent_topics_df = pd.DataFrame()
@@ -120,7 +120,7 @@ class Topics_with_LDA_Bigram:
     return (sent_topics_df)
 
   #Calculate sentiment polarity and find the max value. Normalize the encoded label values.
-  def sentiment_analyzer_scores(df):
+  def sentiment_analyzer_scores(self, df):
     from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
     import math
     analyser = SentimentIntensityAnalyzer()
@@ -135,14 +135,14 @@ class Topics_with_LDA_Bigram:
     return sentiment_score 
 
   #Scalar Vector for testing dataset
-  def testing_dataset_vector(df_testing):
+  def testing_dataset_vector(self, df_testing):
     vec_testing = []
     for i in range(len(df_testing['sentiment_encode'])):
         vec = df_testing['sentiment_encode'].iloc[i] + df_testing['Topic_Score'].iloc[i]
         vec_testing.append(vec)
     return vec_testing      
 
-  def getTopicScoreBigramLDAModel(headline):
+  def getTopicScoreBigramLDAModel(self, headline):
     import pandas as pd
     # Gensim
     import gensim
