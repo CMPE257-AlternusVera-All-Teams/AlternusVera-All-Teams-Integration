@@ -125,7 +125,6 @@ def predictIntention(text, model):
 
         def print_sentiment_scores(sentence):
             snt = senti.polarity_scores(sentence)
-            # print("{:-<40} \n{}".format(sentence, str(snt)))
             
         print_sentiment_scores(df['clean'][0])
 
@@ -212,12 +211,9 @@ def predictIntention(text, model):
         data = df
         train_lda = data[['clean','index']]
         processed_docs = train_lda['clean'].map(lambda doc: doc.split(" "))
-        # print(processed_docs)
         dictionary = gensim.corpora.Dictionary(processed_docs)
-        # print(dictionary)
         # dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=100000)
         bow_corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
-        # print(bow_corpus)
         tfidf = models.TfidfModel(bow_corpus)
         corpus_tfidf = tfidf[bow_corpus]
         lda_model = gensim.models.LdaMulticore(bow_corpus, num_topics=10, id2word=dictionary, passes=2, workers=2)
@@ -274,7 +270,6 @@ def predictIntention(text, model):
         neural_net_model = pickle.load(file)
 
     pred = neural_net_model.predict(df)
-    # print(pred[0])
     
     MI_Label_map={0:'pants-fire',
                   1:'false',
@@ -344,7 +339,6 @@ def predictLable(text):
   with open('/content/AlternusVera-All-Teams-Integration/trailblazers/knn_speaker_Model.pkl', 'rb') as file:  
     knn_speaker_Model = pickle.load(file)
   
-  # print(spearker_df)
   sp = knn_speaker_Model.predict(spearker_df)
 
   res = sp[0,0];
@@ -355,7 +349,6 @@ def predictLable(text):
 
   src=speaker_map.get(res)
 
-  # print(df_test)
   for key in speaker_map:
     if speaker_map[key] == src:
       df_test['Source_cat']=key
@@ -376,7 +369,6 @@ def predictLable(text):
   else:
     res_label=int(res_label)
 
-  # print(pred[0,0])
   return Label_map.get(res_label)
 
 # text='Ann and I extend our congratulations to President-elect Joe Biden and Vice President-elect Kamala Harris. We know both of them as people of good will and admirable character. We pray that God may bless them in the days and years ahead.'

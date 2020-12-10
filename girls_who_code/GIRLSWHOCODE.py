@@ -218,8 +218,6 @@ class Topics_with_LDA_Bigram:
         
     # Do lemmatization keeping only noun, adj, vb, adv
     dt_lemmatized = self.lemmatization(dt_words_bigrams)
-    print(dt_lemmatized) 
-
 
     # Create Dictionary
     id2word = corpora.Dictionary(dt_lemmatized)
@@ -246,7 +244,6 @@ class Topics_with_LDA_Bigram:
 
     #Distillation - Sentiment analysis score
     sentiment_score_dt = self.sentiment_analyzer_scores(df_testing)
-    print(sentiment_score_dt)
 
     #append dataset with sentiment label and normalized encoded value
     sentiment_score = pd.DataFrame(sentiment_score_dt)
@@ -255,7 +252,6 @@ class Topics_with_LDA_Bigram:
     df_testing['Keywords'] = dt_dominant_topic['Keywords']
     df_testing['Dominant_Topic'] = dt_dominant_topic['Dominant_Topic']
     df_testing['Topic_Score'] = dt_dominant_topic['Topic_Score']
-    print(df_testing.head())
 
     #Get test data for classification
 
@@ -561,7 +557,6 @@ class Girlswhocode_PoliticalAfiiliation:
         head_line = str(row)
         text_list = word_tokenize(text_test)  
         headline_list = word_tokenize(head_line)
-        #print(headline_list)
       
         # sw contains the list of stopwords 
         sw = stopwords.words('english')  
@@ -584,7 +579,6 @@ class Girlswhocode_PoliticalAfiiliation:
           vector.append(0)
         else:
           cosine = c / float((sum(l1)*sum(l2))**0.5) 
-          #print("similarity: ", cosine)
           vector.append(cosine)
       return vector
 
@@ -598,7 +592,6 @@ class Girlswhocode_PoliticalAfiiliation:
             frequency = float(words.count(dict_words[i])/len(dict_words))
             row_freq.append(frequency)
         TF.append(row_freq)
-        #print(TF)
     return TF
 
   #Calculate IDF for the dictionary
@@ -616,15 +609,12 @@ class Girlswhocode_PoliticalAfiiliation:
           IDF.append(0)
         else:
           IDF.append(math.log(num_of_docs/count))
-        #print(IDF)
     return IDF
 
   #Calculate TF-IDF for each headline text based on the dictionary created
   def computeTFIDF(self, TF, IDF):
     TFIDF = []
     IDF = np.asarray(IDF)
-    #print(IDF)
-    #print(IDF.T)
     for j in TF:
         tfidf = np.asarray(j) * IDF.T
         TFIDF.append(tfidf)
@@ -659,7 +649,6 @@ class Girlswhocode_PoliticalAfiiliation:
 
 
   def identify_topic_number_score(self, text,df_train):
-    print("here in LDA")
     documents = df_train[['headline_text']]
     processed_docs = documents['headline_text'].map(self.get_word_tokens)
     dictionary = gensim.corpora.Dictionary(processed_docs)
@@ -667,7 +656,6 @@ class Girlswhocode_PoliticalAfiiliation:
     lda_model = gensim.models.LdaMulticore(bow_corpus, num_topics=10, id2word=dictionary, passes=2, workers=2)
     bow_vector = dictionary.doc2bow(self.get_word_tokens(text))
     topic_number , topic_score = sorted(lda_model[bow_vector], key=lambda tup: -1*tup[1])[0]
-    #print (topic_number, topic_score)
     return pd.Series([topic_number, topic_score])
 
   """def get_political_affiliation_test_vector(df, doc2vec_model_pa_test):
@@ -689,7 +677,6 @@ class Girlswhocode_PoliticalAfiiliation:
 
       #creating the dataframe
       df_testing = pd.DataFrame(test,columns=['headline_text','partyaffiliation'])
-      print(df_testing.columns)
 
       #preprocessing of the text
       df_testing = self.text_preprocess(df_testing)
@@ -708,9 +695,8 @@ class Girlswhocode_PoliticalAfiiliation:
       df_testing['democrats_vector'] = self.get_issues_vector(df_testing,democrats_issues)
       
       df_testing['liberterian_vector'] = self.get_issues_vector(df_testing,libertarian_issues)
-      print(df_testing.columns)
 
-#      party_affiliation_dict = pd.read_csv('/content/drive/MyDrive/MLFall2020/girlswhocode/datasets/Alternusvera_dataset/party_affiliaiton_dict.csv')
+     #party_affiliation_dict = pd.read_csv('/content/drive/MyDrive/MLFall2020/girlswhocode/datasets/Alternusvera_dataset/party_affiliaiton_dict.csv')
       party_affiliation_dict = pd.read_csv(self.partyAffiliationDict)
       TF_scores = self.computeTF(df_testing, party_affiliation_dict)
       IDF_scores = self.computeIDF(df_testing, party_affiliation_dict)
@@ -744,34 +730,22 @@ class Girlswhocode_PoliticalAfiiliation:
       sentiment_score_input = pd.DataFrame(sentiment_score_input)
       df_testing['sentiment'] = sentiment_score_input['senti_label']
       df_testing['sentiment_encode'] = sentiment_score_input['senti_label_encode']
-      print(df_testing.columns)
 
       #load train dataset to get the dictionary of issues to calculate the topic score of each headline text
       colnames = ['jsonid', 'label', 'headline_text', 'subject', 'speaker', 'speakerjobtitle', 'stateinfo','partyaffiliation', 'barelytruecounts', 'falsecounts','halftruecounts','mostlytrueocunts','pantsonfirecounts','context']
-#      df_train = pd.read_csv('/content/drive/MyDrive/MLFall2020/girlswhocode/datasets/Alternusvera_dataset/train.tsv', sep='\t', names = colnames,error_bad_lines=False)
+    #df_train = pd.read_csv('/content/drive/MyDrive/MLFall2020/girlswhocode/datasets/Alternusvera_dataset/train.tsv', sep='\t', names = colnames,error_bad_lines=False)
       df_train = pd.read_csv(self.train, sep='\t', names = colnames,error_bad_lines=False)
       #preprocess the df_train headline_text
       df_train = self.train_preprocess(df_train)
-      print(df_train.columns)
 
       
 
 
       #get topic score related to party
       df_testing[['topic_number','topic_score']] = df_testing.apply(lambda row: self.identify_topic_number_score(row['headline_text'],df_train), axis=1)
-      print(df_testing.head())
 
       #get the tagged text fot the headline
       tagged_pa_text_test = self.tag_headline(df_testing, 'partyaffiliation_encode')
-      print("tagged text",tagged_pa_text_test)
-      #get the Doc2Vec for the headline_text
-      print("before")
-      #doc2vec_model_pa_test = Doc2Vec(documents = tagged_pa_text_test, dm=0, num_features=500, min_count=2, size=20, window=4)
-      print("after")
-      #get the test vector 
-      #X_test = self.get_political_affiliation_test_vector(df_testing, doc2vec_model_pa_test)
-      #def get_political_affiliation_test_vector(df, doc2vec_model_pa_test):
-      #doc2vec_model_pa_test = Doc2Vec(documents = tagged_pa_text_test, dm=0, num_features=500, min_count=2, size=20, window=4)
       X_test = []
       for i in range(len(df_testing['partyaffiliation_encode'])):
           pa_value = df_testing['partyaffiliation_encode'][i]
@@ -781,10 +755,10 @@ class Girlswhocode_PoliticalAfiiliation:
       X_test = np.array(X_test)
       X_test = X_test.reshape(-1,1)
       #load the saved model
-#      fakenews_classifier = pickle.load(open('/content/drive/MyDrive/MLFall2020/girlswhocode/models/political_affiliation_model.sav', 'rb'))
+      # fakenews_classifier = pickle.load(open('/content/drive/MyDrive/MLFall2020/girlswhocode/models/political_affiliation_model.sav', 'rb'))
 
       #predict the test input
-#      binary_value_predicted, predicted_proba = self.predict(fakenews_classifier, X_test)
+    #  binary_value_predicted, predicted_proba = self.predict(fakenews_classifier, X_test)
       binary_value_predicted, predicted_proba = self.predict(self.modelPA, X_test)
   
       return (1 - float(predicted_proba))
