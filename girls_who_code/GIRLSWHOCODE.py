@@ -53,6 +53,8 @@ Original file is located at
 
 import pickle
 import pandas as pd
+import warnings
+warnings.filterwarnings('ignore')
 
 class Topics_with_LDA_Bigram: 
 
@@ -891,7 +893,7 @@ class GirlsWhoCode_Toxicity:
     lda_model = gensim.models.LdaMulticore(bow_corpus, num_topics=10, id2word=dictionary, passes=2, workers=2)
     bow_vector = dictionary.doc2bow(self.get_word_tokens(text))
     topic_number , topic_score = sorted(lda_model[bow_vector], key=lambda tup: -1*tup[1])[0]
-    #print (topic_number, topic_score)
+
     return pd.Series([topic_number, topic_score])
 
 
@@ -967,9 +969,6 @@ class GirlsWhoCode_Toxicity:
     df_testing = pd.DataFrame(cols,columns=['headline_text'])
     df_testing.head()
 
-    #encoding the label from text to numeric value
-    #df_testing = self.encodeLabel(df_testing)
-    print(df_testing.head())
 
     #cleanup the text
     df_testing['headline_text'] = df_testing["headline_text"].apply(self.cleaning)
@@ -980,16 +979,13 @@ class GirlsWhoCode_Toxicity:
 
     #encoding the toxicity
     df_testing = self.encodeToxicity(df_testing)
-    print(df_testing.head())
-    #applying distillations
-    #VADER Sentiment Analysis
-    #df_testing = self.getSentiment(df_testing)
+
     sentiment_score_dt = self.sentiment_analyzer_scores(df_testing)
     sentiment_score = pd.DataFrame(sentiment_score_dt)
 
     df_testing['sentiment'] = sentiment_score['sentiment_label']
     df_testing['sentiment_encode'] = sentiment_score['sentiment_label_encode']
-    print(df_testing.head())
+
     #Topic modelling
     import gensim
     from gensim.models.doc2vec import TaggedDocument
