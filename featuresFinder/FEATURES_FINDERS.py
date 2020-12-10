@@ -10,18 +10,12 @@ Original file is located at
 import pandas as pd
 import numpy as np
 import re
-# import sys
-# import random
-# import argparse
 import pickle
-# from collections import defaultdict
-# from csv import DictReader
 from tqdm import tqdm
 from sklearn import feature_extraction
 import xgboost as xgb
 import statistics
 from gensim.models.doc2vec import TaggedDocument
-# stop words are, is, the etc. which are not needed for model
 import nltk
 nltk.download("stopwords") 
 
@@ -227,8 +221,7 @@ class StanceDitectionFeature():
 
     def __generate_fn_features(self, dataset, name):
         h, b = [], []
- # base_path = '/content/drive/MyDrive/MLFall2020/the-feature-finders/AlternusVera/Stance/'
-
+ 
         for d in dataset:
             h.append(d[0])  # title
             b.append(d[1])  # text
@@ -256,10 +249,6 @@ class StanceDitectionFeature():
 
         X_fn = self.__generate_fn_features(fn_dataset, "StanceFeature")
 
-# # Load the best classifier saved model
-# readfile = open('/content/drive/MyDrive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/stance-model-GBC', 'rb')
-# best_clf = pickle.load(readfile)
-
         self.fn_predicted = [self.LABELS[int(a)]
                              for a in self.bestModel.predict(X_fn)]
 
@@ -278,12 +267,6 @@ class StanceDitectionFeature():
         x = self.__predict_stance(headline, body)
         xTrain = np.array(x).reshape(-1, 1)
 
-        #   readfile = open('/content/drive/MyDrive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/stanceLabelGNB-model', 'rb')
-        #   best_clf = pickle.load(readfile)
-
-        #   xPpredicted = best_clf.predict(xTrain)
-        #   xPredicedProb = best_clf.predict_proba(xTrain)[:,1]
-        #   # print(x)
         xPpredicted = self.model.predict(xTrain)
         xPredicedProb = self.model.predict_proba(xTrain)[:, 1]
 
@@ -314,29 +297,16 @@ class ReliableSource():
 
         if (source == ""):
             return 0
-        # print(source)
         d = fakeNewsSites[fakeNewsSites['Site name'].str.match(
             r'\b' + source + r'\b')]
-        # print(d)
         if d.shape[0] > 0:
             return d.iloc[0]['fake_score']
 
-        # if (d['fake_score'].empty):
-        #     return 0
-        # return int(d['fake_score'].values)
         return 0
 
     def FeatureFinders_getReliabilityBySource(self, src):
         x = self.__FeatureFinders_getSourceReliabilityScore(src)
         xTrain = np.array(x).reshape(-1, 1)
-
-#			readfile = open('/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/ReliableSourceLabelmodel', 'rb')
-#			best_clf = pickle.load(readfile)
-#			xPpredicted = best_clf.predict(xTrain)
-#			print(xPpredicted)
-#			xPredicedProb = best_clf.predict_proba(xTrain)[:,1]
-#			#xPredicedProb = best_clf.predict_proba(xTrain)
-#			#print(xPredicedProb)
 
         xPpredicted = self.model.predict(xTrain)
         xPredicedProb = self.model.predict_proba(xTrain)[:, 1]
@@ -417,48 +387,23 @@ class ToxicityFeature():
 
         all_text = headline+body
 
-        # print(all_text)
 
         all_text = self.__label_sentences(all_text, "Test")
-
-#        dbowfile = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/model_dbow', 'rb')
-#        model_dbow = pickle.load(dbowfile)
 
         # Doc2Vec
         test1_vectors_dbow = self.__get_vectors(
             self.model, len(all_text), 300, 'Test')
 
         # best Model for toxicity prediction
-#        toxicityModel_file = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/toxicity-model', 'rb')
-#        best_clf = pickle.load(toxicityModel_file)
-
         # predictions
         predictedToxicity = self.bestModel.predict(test1_vectors_dbow)
         predictedToxicity = set(predictedToxicity)
         predictedToxicity = statistics.mean(predictedToxicity)
 
-#        predictedToxicity = best_clf.predict(test1_vectors_dbow)
-#        predictedToxicity = set(predictedToxicity)
-#        predictedToxicity = statistics.mean(predictedToxicity)
-        #predicedProb = best_clf.predict_proba(test1_vectors_dbow)[:,1]
-        # print(predictedToxicity)
-
-        # best Model for fakenews prediction
-#        toxicityLabel_file = open(
-#            '/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/toxicityFakenewsLabel-model', 'rb')
-#        best_labelclf = pickle.load(toxicityLabel_file)
-
         predictedFakeNews = self.fakeNewsmodel.predict(predictedToxicity)
         predicedProb = self.fakeNewsmodel.predict_proba(predictedToxicity)[
             :, 0]
 
-#        predictedFakeNews = best_labelclf.predict(predictedToxicity)
-#        predicedProb = best_labelclf.predict_proba(predictedToxicity)[:, 0]
-
-        # print(predictedFakeNews)
-        # print(predicedProb)
         return float(predicedProb[0])
 
 
@@ -508,8 +453,6 @@ def cosine_sim(x, y):
         d = cosine_similarity(x, y)
         d = d[0][0]
     except:
-        #print(x)
-        #print(y)
         d = 0.
     return d
 
@@ -530,7 +473,6 @@ def getBigram(words, join_string, skip=0):
   """
   assert type(words) == list
   L = len(words)
-        #print words
   if L > 1:
     lst = []
     for i in range(L-1):
@@ -540,7 +482,6 @@ def getBigram(words, join_string, skip=0):
   else:
     # set it as unigram
     lst = getUnigram(words)
-  #print 'lst returned'
   return lst
     
 def getTrigram(words, join_string, skip=0):
@@ -605,7 +546,6 @@ def print_confusion_matrix(cm):
         lines.append("|{:^11}|{:^11}|{:^11}|{:^11}|{:^11}|".format(LABELS[i],
                                                                    *row))
         lines.append("-"*line_len)
-    #print('\n'.join(lines))
 
 
 def report_score(actual,predicted):
@@ -613,7 +553,6 @@ def report_score(actual,predicted):
     best_score, _ = score_submission(actual,actual)
 
     print_confusion_matrix(cm)
-    #print("Score: " +str(score) + " out of " + str(best_score) + "\t("+str(score*100/best_score) + "%)")
     return score*100/best_score
 
 # ----------------- FeatureGenerator ------------------ #
@@ -653,7 +592,6 @@ class CountFeatureGenerator(FeatureGenerator):
 
         grams = ["unigram", "bigram", "trigram"]
         feat_names = ["Headline", "articleBody"]
-        #print("generate counting features")
         for feat_name in feat_names:
             for gram in grams:
                 df["count_of_%s_%s" % (feat_name, gram)] = list(df.apply(lambda x: len(x[feat_name + "_" + gram]), axis=1))
@@ -673,7 +611,6 @@ class CountFeatureGenerator(FeatureGenerator):
         for feat_name in feat_names:
             #df['len_sent_%s' % feat_name] = df[feat_name].apply(lambda x: len(sent_tokenize(x.decode('utf-8').encode('ascii', errors='ignore'))))
             df['len_sent_%s' % feat_name] = df[feat_name].apply(lambda x: len(sent_tokenize(x)))
-            #print df['len_sent_%s' % feat_name]
 
         # dump the basic counting features into a file
         feat_names = [ n for n in df.columns \
@@ -724,65 +661,37 @@ class CountFeatureGenerator(FeatureGenerator):
             'unconfirmed'
         ]
         
-        #df['refuting_words_in_headline'] = df['Headline'].map(lambda x: 1 if w in x else 0 for w in _refuting_words)
-        #df['hedging_words_in_headline'] = df['Headline'].map(lambda x: 1 if w in x else 0 for w in _refuting_words)
-        #check_words = _refuting_words + _hedging_seed_words
         check_words = _refuting_words
         for rf in check_words:
             fname = '%s_exist' % rf
             feat_names.append(fname)
             df[fname] = list(df['Headline'].map(lambda x: 1 if rf in x else 0))
 	    
-        # number of body texts paired up with the same headline
-        #df['headline_hash'] = df['Headline'].map(lambda x: hashlib.md5(x).hexdigest())
-        #nb_dict = df.groupby(['headline_hash'])['Body ID'].nunique().to_dict()
-        #df['n_bodies'] = df['headline_hash'].map(lambda x: nb_dict[x])
-        #feat_names.append('n_bodies')
-        # number of headlines paired up with the same body text
-        #nh_dict = df.groupby(['Body ID'])['headline_hash'].nunique().to_dict()
-        #df['n_headlines'] = df['Body ID'].map(lambda x: nh_dict[x])
-        #feat_names.append('n_headlines')
-        #print('BasicCountFeatures:')
-        #print(df)
-
         if test_only:
-            #print('test_only:', test_only)
-            # #print(train[['Headline_unigram','Body ID', 'count_of_Headline_unigram']])
-            #print('saving df cols', df.columns)
-            #print('saving df head', df.head(2))
             xBasicCountsTrain = df[feat_names].values
-            #print('xBasicCountsTrain shape', xBasicCountsTrain.shape)
             return [xBasicCountsTrain]
             
         
         # split into train, test portion and save in separate files
         train = df[~df['target'].isnull()]
-        #print('train:')
-        #print(train[['Headline_unigram','Body ID', 'count_of_Headline_unigram']])
         xBasicCountsTrain = train[feat_names].values
-        #print('xBasicCountsTrain shape', xBasicCountsTrain.shape)
         outfilename_bcf_train = "train.basic.pkl"
         if save_file:
             with open(outfilename_bcf_train, "wb") as outfile:
                 pickle.dump(feat_names, outfile, -1)
                 pickle.dump(xBasicCountsTrain, outfile, -1)
-            #print('basic counting features for training saved in %s' % outfilename_bcf_train)
+
         
         test = df[df['target'].isnull()]
-        #print('test:')
-        #print(test[['Headline_unigram','Body ID', 'count_of_Headline_unigram']])
         #return 1
         if test.shape[0] > 0:
             # test set exists
             if save_file:
-                #print('saving test set')
                 xBasicCountsTest = test[feat_names].values
                 outfilename_bcf_test = "test.basic.pkl"
                 with open(outfilename_bcf_test, 'wb') as outfile:
                     pickle.dump(feat_names, outfile, -1)
                     pickle.dump(xBasicCountsTest, outfile, -1)
-                    #print('basic counting features for test saved in %s' % outfilename_bcf_test)
-                    #print('xBasicCountsTest shape', xBasicCountsTest.shape)
 
         return [xBasicCountsTest]
 
@@ -793,11 +702,6 @@ class CountFeatureGenerator(FeatureGenerator):
         with open(fakenews_path + filename_bcf, "rb") as infile:
             feat_names = pickle.load(infile)
             xBasicCounts = pickle.load(infile)
-            #print('feature names: ')
-            #print(feat_names)
-            #print('xBasicCounts.shape:')
-            #print(xBasicCounts.shape)
-            #print type(xBasicCounts)
             np.save('counts_test', [xBasicCounts])
 
         return [xBasicCounts]
@@ -821,14 +725,10 @@ class TfidfFeatureGenerator(FeatureGenerator):
 
         if test_only:
             n_train = df.shape[0]
-            #print('tfidf, n_train:',n_train)
             n_test = 0
-            #print('tfidf, n_test:',n_test)
         else:
             n_train = df[~df['target'].isnull()].shape[0]
-            #print('tfidf, n_train:',n_train)
             n_test = df[df['target'].isnull()].shape[0]
-            #print('tfidf, n_test:',n_test)
 
         # 2). fit a TfidfVectorizer on the concatenated strings
         # 3). sepatately transform ' '.join(Headline_unigram) and ' '.join(articleBody_unigram)
@@ -842,8 +742,6 @@ class TfidfFeatureGenerator(FeatureGenerator):
         if test_only:
             vecH = TfidfVectorizer(ngram_range=(1, 3), max_df=1, min_df=0, vocabulary=vocabulary)
         xHeadlineTfidf = vecH.fit_transform(df['Headline_unigram'].map(lambda x: ' '.join(x))) # use ' '.join(Headline_unigram) instead of Headline since the former is already stemmed
-        #print('xHeadlineTfidf.shape:')
-        #print(xHeadlineTfidf.shape)
         
         # save train and test into separate files
         xHeadlineTfidfTrain = xHeadlineTfidf[:n_train, :]
@@ -851,7 +749,6 @@ class TfidfFeatureGenerator(FeatureGenerator):
             outfilename_htfidf_train = "train.headline.tfidf.pkl"
             with open(outfilename_htfidf_train, "wb") as outfile:
                 pickle.dump(xHeadlineTfidfTrain, outfile, -1)
-            #print('headline tfidf features of training set saved in %s' % outfilename_htfidf_train)
         
         if n_test > 0:
             # test set is available
@@ -860,13 +757,10 @@ class TfidfFeatureGenerator(FeatureGenerator):
                 outfilename_htfidf_test = "test.headline.tfidf.pkl"
                 with open(outfilename_htfidf_test, "wb") as outfile:
                     pickle.dump(xHeadlineTfidfTest, outfile, -1)
-                #print('headline tfidf features of test set saved in %s' % outfilename_htfidf_test)
 
 
         vecB = TfidfVectorizer(ngram_range=(1, 3), max_df=0.8, min_df=2, vocabulary=vocabulary)
         xBodyTfidf = vecB.fit_transform(df['articleBody_unigram'].map(lambda x: ' '.join(x)))
-        #print('xBodyTfidf.shape:')
-        #print(xBodyTfidf.shape)
         
         # save train and test into separate files
         xBodyTfidfTrain = xBodyTfidf[:n_train, :]
@@ -874,7 +768,6 @@ class TfidfFeatureGenerator(FeatureGenerator):
             outfilename_btfidf_train = "train.body.tfidf.pkl"
             with open(outfilename_btfidf_train, "wb") as outfile:
                 pickle.dump(xBodyTfidfTrain, outfile, -1)
-            #print('body tfidf features of training set saved in %s' % outfilename_btfidf_train)
         
         if n_test > 0:
             # test set is availble
@@ -883,7 +776,6 @@ class TfidfFeatureGenerator(FeatureGenerator):
                 outfilename_btfidf_test = "test.body.tfidf.pkl"
                 with open(outfilename_btfidf_test, "wb") as outfile:
                     pickle.dump(xBodyTfidfTest, outfile, -1)
-                #print('body tfidf features of test set saved in %s' % outfilename_btfidf_test)
                
 
         # 4). compute cosine similarity between headline tfidf features and body tfidf features
@@ -900,14 +792,11 @@ class TfidfFeatureGenerator(FeatureGenerator):
         simTfidf = np.asarray(list(res))[:, np.newaxis]
         #
 
-        #print('simTfidf.shape:')
-        #print(simTfidf.shape)
         simTfidfTrain = simTfidf[:n_train]
         if save_file:
             outfilename_simtfidf_train = "train.sim.tfidf.pkl"
             with open(outfilename_simtfidf_train, "wb") as outfile:
                 pickle.dump(simTfidfTrain, outfile, -1)
-            #print('tfidf sim. features of training set saved in %s' % outfilename_simtfidf_train)
         
         if n_test > 0:
             # test set is available
@@ -916,15 +805,7 @@ class TfidfFeatureGenerator(FeatureGenerator):
                 outfilename_simtfidf_test = "test.sim.tfidf.pkl"
                 with open(outfilename_simtfidf_test, "wb") as outfile:
                     pickle.dump(simTfidfTest, outfile, -1)
-                #print('tfidf sim. features of test set saved in %s' % outfilename_simtfidf_test)
 
-        #print('return tfidf shapes')
-        #print('xHeadlineTfidf.shape:')
-        #print(xHeadlineTfidf.shape)
-        #print('xBodyTfidf.shape:')
-        #print(xBodyTfidf.shape)
-        #print('simTfidf.shape:')
-        #print(simTfidf.shape)
         return [xHeadlineTfidf, xBodyTfidf, simTfidf]
         # return [simTfidf.reshape(-1, 1)]
 
@@ -941,15 +822,6 @@ class TfidfFeatureGenerator(FeatureGenerator):
         with open(fakenews_path + filename_simtfidf, "rb") as infile:
             simTfidf = pickle.load(infile)
 
-        #print('xHeadlineTfidf.shape:')
-        #print(xHeadlineTfidf.shape)
-        #print type(xHeadlineTfidf)
-        #print('xBodyTfidf.shape:')
-        #print(xBodyTfidf.shape)
-        #print type(xBodyTfidf)
-        #print('simTfidf.shape:')
-        #print(simTfidf.shape)
-        #print type(simTfidf)
 
         # return [xHeadlineTfidf, xBodyTfidf, simTfidf.reshape(-1, 1)]
         return [simTfidf.reshape(-1, 1)]
@@ -967,21 +839,15 @@ class SvdFeatureGenerator(FeatureGenerator):
         
         if test_only:
             n_train = df.shape[0]
-            #print('SvdFeatureGenerator, n_train:',n_train)
             n_test = 0
-            #print('SvdFeatureGenerator, n_test:',n_test)
         else:
             n_train = df[~df['target'].isnull()].shape[0]
-            #print('SvdFeatureGenerator, n_train:',n_train)
             n_test  = df[df['target'].isnull()].shape[0]
-            #print('SvdFeatureGenerator, n_test:',n_test)
 
 
         if xHeadlineTfidfTrain is not None and xBodyTfidfTrain is not None:
-            #print('xHeadlineTfidfTrain not None and xBodyTfidfTrain not None')
-            print("")
+            pass 
         else:
-            #print('xHeadlineTfidfTrain is None or xBodyTfidfTrain is None')
             tfidfGenerator = TfidfFeatureGenerator('tfidf')
             featuresTrain = tfidfGenerator.read('train')
             xHeadlineTfidfTrain, xBodyTfidfTrain = featuresTrain[0], featuresTrain[1]
@@ -1000,18 +866,13 @@ class SvdFeatureGenerator(FeatureGenerator):
         svd = TruncatedSVD(n_components=15, n_iter=15)
         xHBTfidf = vstack([xHeadlineTfidf, xBodyTfidf])
         svd.fit(xHBTfidf) # fit to the combined train-test set (or the full training set for cv process)
-        #print('xHeadlineTfidf.shape:')
-        #print(xHeadlineTfidf.shape)
         xHeadlineSvd = svd.transform(xHeadlineTfidf)
-        #print('svd after transform xHeadlineSvd.shape:')
-        #print(xHeadlineSvd.shape)
         
         xHeadlineSvdTrain = xHeadlineSvd[:n_train, :]
         if save_file:
             outfilename_hsvd_train = "train.headline.svd.pkl"
             with open(outfilename_hsvd_train, "wb") as outfile:
                 pickle.dump(xHeadlineSvdTrain, outfile, -1)
-            #print('headline svd features of training set saved in %s' % outfilename_hsvd_train)
         
         if n_test > 0:
             # test set is available
@@ -1020,18 +881,14 @@ class SvdFeatureGenerator(FeatureGenerator):
                 outfilename_hsvd_test = "test.headline.svd.pkl"
                 with open(outfilename_hsvd_test, "wb") as outfile:
                     pickle.dump(xHeadlineSvdTest, outfile, -1)
-                #print('headline svd features of test set saved in %s' % outfilename_hsvd_test)
 
         xBodySvd = svd.transform(xBodyTfidf)
-        #print('xBodySvd.shape:')
-        #print(xBodySvd.shape)
         
         xBodySvdTrain = xBodySvd[:n_train, :]
         if save_file:
             outfilename_bsvd_train = "train.body.svd.pkl"
             with open(outfilename_bsvd_train, "wb") as outfile:
                 pickle.dump(xBodySvdTrain, outfile, -1)
-            #print('body svd features of training set saved in %s' % outfilename_bsvd_train)
         
         if n_test > 0:
             # test set is available
@@ -1040,7 +897,6 @@ class SvdFeatureGenerator(FeatureGenerator):
                 outfilename_bsvd_test = "test.body.svd.pkl"
                 with open(outfilename_bsvd_test, "wb") as outfile:
                     pickle.dump(xBodySvdTest, outfile, -1)
-                #print('body svd features of test set saved in %s' % outfilename_bsvd_test)
 
         # work-around for array indice error
         # simSvd = np.asarray(map(cosine_sim, xHeadlineSvd, xBodySvd))[:, np.newaxis]
@@ -1054,15 +910,12 @@ class SvdFeatureGenerator(FeatureGenerator):
 
         simSvd = np.asarray(list(res))[:, np.newaxis]
         
-        #print('simSvd.shape:')
-        #print(simSvd.shape)
 
         simSvdTrain = simSvd[:n_train]
         if save_file:
             outfilename_simsvd_train = "train.sim.svd.pkl"
             with open(outfilename_simsvd_train, "wb") as outfile:
                 pickle.dump(simSvdTrain, outfile, -1)
-            #print('svd sim. features of training set saved in %s' % outfilename_simsvd_train)
         
         if n_test > 0:
             # test set is available
@@ -1071,15 +924,9 @@ class SvdFeatureGenerator(FeatureGenerator):
             if save_file:
                 with open(outfilename_simsvd_test, "wb") as outfile:
                     pickle.dump(simSvdTest, outfile, -1)
-                #print('svd sim. features of test set saved in %s' % outfilename_simsvd_test)
 
         if test_only:
             # pad with 0 since the model has much more values after truncated
-            #print('manually add empty features')
-            #print('xHeadlineSvd mine:', xHeadlineSvd)
-
-            #print('xHeadlineSvd mine 0:',xHeadlineSvd[0])
-            #print('xHeadlineSvd mine 00:',xHeadlineSvd[0][0])
 
             result1 = np.pad(xHeadlineSvd[0], (0, 48), 'constant') # pad with 0s, 0 offset left, 48 right
             xHeadlineSvd = [result1]
@@ -1087,14 +934,6 @@ class SvdFeatureGenerator(FeatureGenerator):
             result2 = np.pad(xBodySvd[0], (0, 48), 'constant') # pad with 0s, 0 offset left, 48 right
             xBodySvd = [result2]
             
-            #print('return svd shapes')
-            #print('xHeadlineSvd.shape:')
-            # #print(xHeadlineSvd.shape)
-            #print('xBodySvd.shape:')
-            # #print(xBodySvd.shape)
-            #print('simSvd.shape:')
-            #print(type(simSvd))
-            # #print(simSvd.shape)
 
             return [xHeadlineSvd, xBodySvd, simSvd.reshape(-1, 1)]
 
@@ -1116,16 +955,6 @@ class SvdFeatureGenerator(FeatureGenerator):
         with open(fakenews_path + filename_simsvd, "rb") as infile:
             simSvd = pickle.load(infile)
 
-        #print('xHeadlineSvd.shape:')
-        #print(xHeadlineSvd.shape)
-        ##print(type(xHeadlineSvd))
-        #print('xBodySvd.shape:')
-        #print(xBodySvd.shape)
-        ##print(type(xBodySvd))
-        #print('simSvd.shape:')
-        #print(simSvd.shape)
-        ##print(type(simSvd))
-
         return [xHeadlineSvd, xBodySvd, simSvd.reshape(-1, 1)]
         #return [simSvd.reshape(-1, 1)]
 
@@ -1136,65 +965,41 @@ from functools import reduce
 
 class Word2VecFeatureGenerator(FeatureGenerator):
 
-#    def __load(self, path):
-#        with open(path, 'rb') as file:
-#            return pickle.load(file)
-#    model = gensim.models.KeyedVectors.load_word2vec_format("/content/drive/My Drive/MLFall2020/the-feature-finders/datasets/fakenewschallenge/GoogleNews-vectors-negative300.bin", binary=True)
-
     def __init__(self, gensim, name='word2vecFeatureGenerator'):
         super(Word2VecFeatureGenerator, self).__init__(name)
         self.modelGensim = gensim
 
     def process(self, df, save_file=True, test_only=False):
 
-        #print('generating word2vec features')
         df["Headline_unigram_vec"] = df["Headline"].map(lambda x: preprocess_data(x, exclude_stopword=False, stem=False))
         df["articleBody_unigram_vec"] = df["articleBody"].map(lambda x: preprocess_data(x, exclude_stopword=False, stem=False))
         
         if test_only:
           n_train = df.shape[0]
-          #print('Word2VecFeatureGenerator: n_train:',n_train)
           n_test = 0
-          #print('Word2VecFeatureGenerator: n_test:',n_test)
         else:
           n_train = df[~df['target'].isnull()].shape[0]
-          #print('Word2VecFeatureGenerator: n_train:',n_train)
           n_test = df[df['target'].isnull()].shape[0]
-          #print('Word2VecFeatureGenerator: n_test:',n_test)
         
         # 1). document vector built by multiplying together all the word vectors
         # using Google's pre-trained word vectors
         # model = gensim.models.KeyedVectors.load_word2vec_format("/content/drive/My Drive/mydata/fakenewschallenge/GoogleNews-vectors-negative300.bin", binary=True)
-        #print('google news model loaded')
 
         Headline_unigram_array = df['Headline_unigram_vec'].values
-        #print('Headline_unigram_array:')
-        #print(Headline_unigram_array)
-        #print(Headline_unigram_array.shape)
-        #print(type(Headline_unigram_array))
         
         # word vectors weighted by normalized tf-idf coefficient?
         #headlineVec = [0]
 
-#        headlineVec = list(map(lambda x: reduce(np.add, [Word2VecFeatureGenerator.model[y] for y in x if y in Word2VecFeatureGenerator.model], [0.]*300), Headline_unigram_array))
         headlineVec = list(map(lambda x: reduce(np.add, [self.modelGensim[y] for y in x if y in self.modelGensim], [0.]*300), Headline_unigram_array))
         headlineVec = np.array(headlineVec)
-        #print('headlineVec:')
-        #print(headlineVec)
-        #print('type(headlineVec)')
-        #print(type(headlineVec))
         #headlineVec = np.exp(headlineVec)
         headlineVec = normalize(headlineVec)
-        #print('headlineVec')
-        #print(headlineVec)
-        #print(headlineVec.shape)
         
         headlineVecTrain = headlineVec[:n_train, :]
         if save_file:
             outfilename_hvec_train = "train.headline.word2vec.pkl"
             with open(outfilename_hvec_train, "wb") as outfile:
                 pickle.dump(headlineVecTrain, outfile, -1)
-            #print('headline word2vec features of training set saved in %s' % outfilename_hvec_train)
 
         if n_test > 0:
             # test set is available
@@ -1203,27 +1008,18 @@ class Word2VecFeatureGenerator(FeatureGenerator):
                 outfilename_hvec_test = "test.headline.word2vec.pkl"
                 with open(outfilename_hvec_test, "wb") as outfile:
                     pickle.dump(headlineVecTest, outfile, -1)
-                #print('headline word2vec features of test set saved in %s' % outfilename_hvec_test)
-        #print('headine done')
 
         Body_unigram_array = df['articleBody_unigram_vec'].values
-        #print('Body_unigram_array:')
-        #print(Body_unigram_array)
-        #print(Body_unigram_array.shape)
         #bodyVec = [0]
         bodyVec = list(map(lambda x: reduce(np.add, [self.modelGensim[y] for y in x if y in self.modelGensim], [0.]*300), Body_unigram_array))
         bodyVec = np.array(bodyVec)
         bodyVec = normalize(bodyVec)
-        #print('bodyVec')
-        #print(bodyVec)
-        #print(bodyVec.shape)
 
         bodyVecTrain = bodyVec[:n_train, :]
         if save_file:
             outfilename_bvec_train = "train.body.word2vec.pkl"
             with open(outfilename_bvec_train, "wb") as outfile:
                 pickle.dump(bodyVecTrain, outfile, -1)
-            #print('body word2vec features of training set saved in %s' % outfilename_bvec_train)
         
         if n_test > 0:
             # test set is available
@@ -1232,9 +1028,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
                 outfilename_bvec_test = "test.body.word2vec.pkl"
                 with open(outfilename_bvec_test, "wb") as outfile:
                     pickle.dump(bodyVecTest, outfile, -1)
-                #print('body word2vec features of test set saved in %s' % outfilename_bvec_test)
 
-        #print('body done')
 
         # compute cosine similarity between headline/body word2vec features
         # simVec = np.asarray(map(cosine_sim, headlineVec, bodyVec))[:, np.newaxis]
@@ -1247,15 +1041,12 @@ class Word2VecFeatureGenerator(FeatureGenerator):
             for i in range(0, 75385):
                 res.append(cosine_sim(headlineVec[i], bodyVec[i]))
         simVec = np.asarray(list(res))[:, np.newaxis]
-        #print('simVec.shape:')
-        #print(simVec.shape)
 
         simVecTrain = simVec[:n_train]
         if save_file:
             outfilename_simvec_train = "train.sim.word2vec.pkl"
             with open(outfilename_simvec_train, "wb") as outfile:
                 pickle.dump(simVecTrain, outfile, -1)
-            #print('word2vec sim. features of training set saved in %s' % outfilename_simvec_train)
         
         if n_test > 0:
             # test set is available
@@ -1264,15 +1055,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
                 outfilename_simvec_test = "test.sim.word2vec.pkl"
                 with open(outfilename_simvec_test, "wb") as outfile:
                     pickle.dump(simVecTest, outfile, -1)
-                #print('word2vec sim. features of test set saved in %s' % outfilename_simvec_test)
 
-        #print('return w2vec shapes')
-        #print('headlineVecTrain.shape:')
-        #print(headlineVecTrain.shape)
-        #print('bodyVecTrain.shape:')
-        #print(bodyVecTrain.shape)
-        #print('simVecTrain.shape:')
-        #print(simVecTrain.shape)
         return [headlineVecTrain, bodyVecTrain, simVecTrain]
 
     def read(self, header='train'):
@@ -1289,12 +1072,6 @@ class Word2VecFeatureGenerator(FeatureGenerator):
         with open(fakenews_path + filename_simvec, "rb") as infile:
             simVec = pickle.load(infile)
 
-        #print('headlineVec.shape:')
-        #print(headlineVec.shape)
-        #print('bodyVec.shape:')
-        #print(bodyVec.shape)
-        #print('simVec.shape:')
-        #print(simVec.shape)
 
         return [headlineVec, bodyVec, simVec]
         #return [simVec.reshape(-1,1)]
@@ -1310,19 +1087,13 @@ class SentimentFeatureGenerator(FeatureGenerator):
 
     def process(self, df, save_file=True, test_only=False):
 
-        #print('generating sentiment features')
-        #print('for headline')
         
         if test_only:
           n_train = df.shape[0]
-          #print('SentimentFeatureGenerator: n_train:',n_train)
           n_test = 0
-          #print('SentimentFeatureGenerator: n_test:',n_test)
         else:
           n_train = df[~df['target'].isnull()].shape[0]
-          #print('SentimentFeatureGenerator: n_train:',n_train)
           n_test = df[df['target'].isnull()].shape[0]
-          #print('SentimentFeatureGenerator: n_test:',n_test)
 
         # calculate the polarity score of each sentence then take the average
         sid = SentimentIntensityAnalyzer()
@@ -1337,20 +1108,13 @@ class SentimentFeatureGenerator(FeatureGenerator):
         df['headline_sents'] = df['Headline'].apply(lambda x: sent_tokenize(x))
         df = pd.concat([df, df['headline_sents'].apply(lambda x: compute_sentiment(x))], axis=1)
         df.rename(columns={'compound':'h_compound', 'neg':'h_neg', 'neu':'h_neu', 'pos':'h_pos'}, inplace=True)
-        #print 'df:'
-        #print df
-        #print df.columns
-        #print df.shape
         headlineSenti = df[['h_compound','h_neg','h_neu','h_pos']].values
-        #print('headlineSenti.shape:')
-        #print(headlineSenti.shape)
         
         headlineSentiTrain = headlineSenti[:n_train, :]
         if save_file:
             outfilename_hsenti_train = "train.headline.senti.pkl"
             with open(outfilename_hsenti_train, "wb") as outfile:
                 pickle.dump(headlineSentiTrain, outfile, -1)
-            #print('headline sentiment features of training set saved in %s' % outfilename_hsenti_train)
         
         if n_test > 0:
             # test set is available
@@ -1359,30 +1123,19 @@ class SentimentFeatureGenerator(FeatureGenerator):
                 outfilename_hsenti_test = "test.headline.senti.pkl"
                 with open(outfilename_hsenti_test, "wb") as outfile:
                     pickle.dump(headlineSentiTest, outfile, -1)
-                #print('headline sentiment features of test set saved in %s' % outfilename_hsenti_test)
-        
-        #print('headine senti done')
         
         #return 1
 
-        #print('for body')
-        #df['body_sents'] = df['articleBody'].map(lambda x: sent_tokenize(x.decode('utf-8')))
         df['body_sents'] = df['articleBody'].map(lambda x: sent_tokenize(x))
         df = pd.concat([df, df['body_sents'].apply(lambda x: compute_sentiment(x))], axis=1)
         df.rename(columns={'compound':'b_compound', 'neg':'b_neg', 'neu':'b_neu', 'pos':'b_pos'}, inplace=True)
-        #print 'body df:'
-        #print df
-        #print df.columns
         bodySenti = df[['b_compound','b_neg','b_neu','b_pos']].values
-        #print('bodySenti.shape:')
-        #print(bodySenti.shape)
         
         bodySentiTrain = bodySenti[:n_train, :]
         if save_file:
             outfilename_bsenti_train = "train.body.senti.pkl"
             with open(outfilename_bsenti_train, "wb") as outfile:
                 pickle.dump(bodySentiTrain, outfile, -1)
-            #print('body sentiment features of training set saved in %s' % outfilename_bsenti_train)
         
         if n_test > 0:
             # test set is available
@@ -1391,15 +1144,6 @@ class SentimentFeatureGenerator(FeatureGenerator):
                 outfilename_bsenti_test = "test.body.senti.pkl"
                 with open(outfilename_bsenti_test, "wb") as outfile:
                     pickle.dump(bodySentiTest, outfile, -1)
-                #print('body sentiment features of test set saved in %s' % outfilename_bsenti_test)
-
-        #print('body senti done')
-
-        #print('senti return shapes')
-        #print('headlineSentiTrain.shape:')
-        #print(headlineSentiTrain.shape)
-        #print('bodySentiTrain.shape:')
-        #print(bodySentiTrain.shape)
 
         return [headlineSentiTrain, bodySentiTrain]
 
@@ -1414,22 +1158,12 @@ class SentimentFeatureGenerator(FeatureGenerator):
         with open(fakenews_path + filename_bsenti, "rb") as infile:
             bodySenti = pickle.load(infile)
         np.save('senti_headline_body_test', [headlineSenti, bodySenti])
-        #print('headlineSenti.shape:')
-        #print(headlineSenti.shape)
-        #print type(headlineSenti)
-        #print('bodySenti.shape:')
-        #print(bodySenti.shape)
-        #print type(bodySenti)
 
         return [headlineSenti, bodySenti]
 
 
 
 # ----------------- TitleVsBody ------------------ #
-# imports
-# team_features-finders-factor_title_vs_body.py
-# from team_features_finders_factor_title_vs_body import TitleVsBody as tvb
-
 
 class TitleVsBody():
 
@@ -1437,13 +1171,6 @@ class TitleVsBody():
         self.modelLog = self.__load(filenameModelLog)
         self.modelXgb = self.__load(filenameModelXgb)
         self.modelGensim = gensimModel
-
-#        self.bestModel = self.__load(filenameBestModel)
-#        self.base_path = base_path
-#    model_path = "/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/"
-#    file_name = "titlevsbody_logistic_proba.pkl"
-#    titlevsbody_logistic_proba = pickle.load(open(model_path + file_name, "rb"))
-
 
     def __load(self, path):
         with open(path, 'rb') as file:
@@ -1454,56 +1181,41 @@ class TitleVsBody():
     Return a list with a single predicted value (int 0-3) for Title Vs Body 
     '''
     def FeatureFinders_getTitleVsBodyRelationship(self, head_line="", body_text=""):
-        #print("head_line=", head_line)
-        #print("body_text=", body_text)
         head_line = head_line.strip()
         body_text = body_text.strip()
 
         if not head_line or not body_text: # return 3-unrelated if BAD data!!!
-            print("Bad body data")
+            # print("Bad body data")
             return [3]
 
         init_data = { 'Headline': [head_line], 'articleBody': [body_text] }
 
         data = pd.DataFrame(init_data, columns = ['Headline', 'articleBody'])
-        #print(data.head())
 
-        #print('Generate unigrams', data.shape)
         # generate unigram
         data["Headline_unigram"] = data["Headline"].map(lambda x: preprocess_data(x))
         data["articleBody_unigram"] = data["articleBody"].map(lambda x: preprocess_data(x))
 
         # generate bigram
-        ##print('Generate bigrams', data.shape)
         join_str = "_"
         data["Headline_bigram"] = data["Headline_unigram"].map(lambda x: getBigram(x, join_str))
         data["articleBody_bigram"] = data["articleBody_unigram"].map(lambda x: getBigram(x, join_str))
 
         # generate trigram
-        #print('Generate trigrams', data.shape)
         data["Headline_trigram"] = data["Headline_unigram"].map(lambda x: getTrigram(x, join_str))
         data["articleBody_trigram"] = data["articleBody_unigram"].map(lambda x: getTrigram(x, join_str))
         
-        #print('shape:', data.shape)
-        #print('columns:', data.columns)
-        #print('after', data.head())
-
         c_fg = CountFeatureGenerator()
         basic_count = c_fg.process(data, save_file=False, test_only=True)
-        #print(type(basic_count))
 
         tfidf_fg = TfidfFeatureGenerator()
         # tfidf = [xHeadlineTfidf, xBodyTfidf, simTfidf]
         tfidf = tfidf_fg.process(data, save_file=False, test_only=True)
-        #print("tfidf:", tfidf)
-        #print(type(tfidf))
         
         # tfidfGenerator = TfidfFeatureGenerator('tfidf')
         # featuresTrain = tfidfGenerator.read('train')
         xHeadlineTfidfTrain, xBodyTfidfTrain, simTfidf = tfidf[0], tfidf[1], tfidf[2]
         simTfidf = [simTfidf.reshape(-1, 1)]
-        #print("simTfidf len:", len(simTfidf))
-        #print("simTfidf:", simTfidf)
         # return [simTfidf.reshape(-1, 1)]
 
 
@@ -1511,24 +1223,15 @@ class TitleVsBody():
         svd_fg = SvdFeatureGenerator()
         # svd = [xHeadlineSvd, xBodySvd, simSvd.reshape(-1, 1)]
         svd = svd_fg.process(data, xHeadlineTfidfTrain=xHeadlineTfidfTrain, xBodyTfidfTrain=xBodyTfidfTrain, save_file=False, test_only=True)
-        #print("svd len:", len(svd))
-        #print("svd:", svd)
-        #print(type(svd))
 
 
         w2v_fg = Word2VecFeatureGenerator(self.modelGensim, name='word2vecFeatureGenerator')
         # w2v = [headlineVecTrain, bodyVecTrain, simVecTrain]
         w2v = w2v_fg.process(data, save_file=False, test_only=True)
-        #print("w2v len:", len(w2v))
-        #print("w2v:", w2v)
-        #print(type(w2v))
 
         senti_fg = SentimentFeatureGenerator()
         # senti = [headlineSentiTrain, bodySentiTrain]
         senti = senti_fg.process(data, save_file=False, test_only=True)
-        #print("senti len:", len(senti))
-        #print("senti:", senti)
-        #print(type(senti))
         
         # features = [f for g in generators for f in g.read('train')]
         values = [basic_count, simTfidf, svd, w2v, senti]
@@ -1537,41 +1240,22 @@ class TitleVsBody():
         #     for f in v:
         #         features.append(f)
         
-        #print ((features))
         data_x = np.hstack(features)
         test_x = data_x
-        #print('test_x len:')
-        #print(len(test_x))
-        #print(data_x[0,:])
-        #print('data_x.shape')
-        #print(data_x.shape)
+
 
         # dtrain = xgb.DMatrix(data_x, label=data_y, weight=w)
         dtest = xgb.DMatrix(test_x)
 
-#        # load model
-#       model_path = "/content/drive/My Drive/MLFall2020/the-feature-finders/AlternusVera/pickled-model/"
-#       file_name = "titlevsbody_xgboost.pkl"
-#       bst = pickle.load(open(model_path + file_name, "rb"))
-#       #print('bst type:', type(bst))
-
         pred = self.modelXgb.predict(dtest)
         pred_prob_y = pred.reshape(test_x.shape[0], 4)
         pred_prob_y = self.modelXgb.predict(dtest).reshape(test_x.shape[0], 4)
-        #print('pred_prob_y:', pred_prob_y)
 
         pred_y = np.argmax(pred_prob_y, axis = 1)
-        #print('pred_y.shape:', pred_y.shape)
-        #print('pred_y:', pred_y)
         
-        print("predicted titleVsBody:", str(pred_y))
-
         return pred_y
 
     def FeatureFinders_getTitleVsBodyScore(self, val): # int val 0-3 of TitleVsBody labels
-#        # model_path = "/content/drive/My Drive/the-feature-finders/AlternusVera/pickled-model/"
-#        # file_name = "titlevsbody_logistic_proba.pkl"
-#        # titlevsbody_logistic_proba = pickle.load(open(model_path + file_name, "rb"))
         arr = np.array([val])
         return self.modelLog.predict_proba(arr.reshape(-1, 1))
 
