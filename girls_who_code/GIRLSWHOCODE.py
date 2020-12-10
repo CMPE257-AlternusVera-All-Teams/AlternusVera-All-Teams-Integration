@@ -367,17 +367,17 @@ class Gwc_Bias():
       spin_words = ['emerge','serious','refuse','crucial','high-stakes','tirade','landmark','major','critical','decrying','offend','stern','offensive','meaningful','significant','monumental','finally','concede','dodge','latest','admission','acknowledge','mock','rage','brag','lashed','scoff','frustrate','incense','erupt','rant','boast','gloat','fume',]
         
       #Creating some latent variables from the data
-      dfrme['clean']     = dfrme['text'].apply(lambda x: Gwc_Bias.cleaning(x))
-      dfrme['clean']     = dfrme['clean'].apply(lambda x: Gwc_Bias.process_text(x))
+      dfrme['clean']     = dfrme['text'].apply(lambda x: self.cleaning(x))
+      dfrme['clean']     = dfrme['clean'].apply(lambda x: self.process_text(x))
       dfrme['num_words']     = dfrme['clean'].apply(lambda x: len(x.split()))
-      dfrme['pos']     = dfrme['clean'].apply(lambda x: Gwc_Bias.get_pos(x))
-      dfrme['sentiment_vector'] = dfrme['clean'].apply(lambda x: Gwc_Bias.get_senti(x))
+      dfrme['pos']     = dfrme['clean'].apply(lambda x: self.get_pos(x))
+      dfrme['sentiment_vector'] = dfrme['clean'].apply(lambda x: self.get_senti(x))
       dfrme['sentiment_score'] = dfrme['sentiment_vector'].apply(lambda x: x[1:][-1])
-      dfrme['total_spin_bias']  = dfrme['pos'].apply(lambda x: Gwc_Bias.get_intersection(x, spin_words))
-      dfrme['total_subj_bias']  = dfrme['pos'].apply(lambda x: Gwc_Bias.get_intersection(x, subjective_words))
-      dfrme['total_sens_bias']  = dfrme['pos'].apply(lambda x: Gwc_Bias.get_intersection(x, sensationalism_words))
+      dfrme['total_spin_bias']  = dfrme['pos'].apply(lambda x: self.get_intersection(x, spin_words))
+      dfrme['total_subj_bias']  = dfrme['pos'].apply(lambda x: self.get_intersection(x, subjective_words))
+      dfrme['total_sens_bias']  = dfrme['pos'].apply(lambda x: self.get_intersection(x, sensationalism_words))
       dfrme['total']     = dfrme.apply(lambda x: x.total_spin_bias + x.total_subj_bias + x.total_sens_bias, axis=1)
-      dfrme['bias']      = dfrme.apply(lambda x: Gwc_Bias.get_wasserstein_dist(x.total_spin_bias, x.total_subj_bias, x.total_sens_bias, x.sentiment_score), axis =1)
+      dfrme['bias']      = dfrme.apply(lambda x: self.get_wasserstein_dist(x.total_spin_bias, x.total_subj_bias, x.total_sens_bias, x.sentiment_score), axis =1)
 
       Xtxt = dfrme['bias'].values.reshape(-1, 1)
 
