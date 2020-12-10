@@ -148,11 +148,7 @@ class Seekers_ClickBait():
 
 #print('op ', Seekers_ClickBait('Seekers_ClickBait.sav','tfidf.sav').predict('text here'))
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 2b4f9adb962b64967b0e0a8cb679338f92fda282
 class Seekers_Spam():
 
   def __init__(self, loaded_tdIdfModel, loaded_model):
@@ -176,8 +172,4 @@ class Seekers_Spam():
     result = self.loaded_model.predict_proba(text.toarray())[:,1][0]
     return result
 
-<<<<<<< HEAD
 #print('op ', Seekers_Spam('TFidfvectorizer.sav','final_SpamModel.sav').predict('text here'))
-=======
-#print('op ', Seekers_Spam('TFidfvectorizer.sav','final_SpamModel.sav').predict('text here'))
->>>>>>> 2b4f9adb962b64967b0e0a8cb679338f92fda282
