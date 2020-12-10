@@ -74,7 +74,7 @@ class Topics_with_LDA_Bigram:
     from nltk.corpus import stopwords
     from gensim.utils import simple_preprocess
     import nltk
-    nltk.download('stopwords')
+    nltk.download('stopwords', quiet=True)
     stop_words = stopwords.words('english')
     stop_words.extend(['from', 'subject', 're', 'edu', 'use'])
     return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
@@ -261,10 +261,10 @@ class Gwc_Bias():
       from nltk.stem.wordnet import WordNetLemmatizer
       lemmatizer = nltk.WordNetLemmatizer()
       from nltk.corpus import stopwords
-      nltk.download('punkt')
-      nltk.download('averaged_perceptron_tagger')
-      nltk.download('wordnet')
-      nltk.download('stopwords')
+      nltk.download('punkt', quiet=True)
+      nltk.download('averaged_perceptron_tagger', quiet=True)
+      nltk.download('wordnet', quiet=True)
+      nltk.download('stopwords', quiet=True)
 
     
       # 1. Remove non-letters/Special Characters and Punctuations
@@ -330,7 +330,7 @@ class Gwc_Bias():
     
     def get_senti(self, sentence):
       import nltk.sentiment
-      nltk.download('vader_lexicon')
+      nltk.download('vader_lexicon', quiet=True)
       senti = nltk.sentiment.vader.SentimentIntensityAnalyzer()
 
       sentimentVector = []
@@ -390,7 +390,7 @@ Original file is located at
 """
 
 class Girlswhocode_PoliticalAfiiliation:
-  nltk.download('stopwords')
+  nltk.download('stopwords', quiet=True)
 
   def __init__(self, filenameModelPA, partyAffiliationDict, newDict, train): 
       self.modelPA = self.__load(filenameModelPA)
@@ -755,9 +755,9 @@ class GirlsWhoCode_Toxicity:
   def cleaning(self, raw_news):
     import nltk
     from nltk.stem.wordnet import WordNetLemmatizer
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    nltk.download('wordnet')
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
+    nltk.download('wordnet', quiet=True)
     import nltk
 
     # 1. Remove non-letters/Special Characters and Punctuations
@@ -866,7 +866,7 @@ class GirlsWhoCode_Toxicity:
     from gensim.models import Doc2Vec
     import nltk
     from nltk import word_tokenize
-    nltk.download('punkt')
+    nltk.download('punkt', quiet=True)
     tagged_text = []
     for index, row in df.iterrows():
         tagged_text.append(TaggedDocument(words=word_tokenize(row['headline_text']), tags=[row['label']]))
