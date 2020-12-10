@@ -1,39 +1,39 @@
 # -*- coding: utf-8 -*-
 # load required libraries and read data
-import os
+#D import os
 import pandas as pd
 import numpy as np
-import seaborn as sns
+#D import seaborn as sns
 import gensim
 import string
-import operator
+#D import operator
 import re
 import nltk
 import math
 import pickle
-from sklearn import svm
-import matplotlib.pyplot as plt
-from sklearn.pipeline import Pipeline
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import  LogisticRegression
-from sklearn.linear_model import SGDClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
-from sklearn.metrics import confusion_matrix, f1_score, classification_report
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import learning_curve
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
+#D from sklearn import svm
+#D import matplotlib.pyplot as plt
+#D from sklearn.pipeline import Pipeline
+#D from sklearn.naive_bayes import MultinomialNB
+#D from sklearn.linear_model import  LogisticRegression
+#D from sklearn.linear_model import SGDClassifier
+#D from sklearn.ensemble import RandomForestClassifier
+#D from sklearn.model_selection import KFold
+#D from sklearn.metrics import confusion_matrix, f1_score, classification_report
+#D from sklearn.model_selection import GridSearchCV
+#D from sklearn.model_selection import learning_curve
+#D from sklearn.metrics import precision_recall_curve
+#D from sklearn.metrics import average_precision_score
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from gensim.models import word2vec
 from nltk import word_tokenize
-from sklearn.metrics import precision_recall_fscore_support as score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.feature_extraction.text import TfidfVectorizer
+#DD from sklearn.metrics import precision_recall_fscore_support as score
+#D from sklearn.metrics import confusion_matrix
+#D from sklearn.metrics import accuracy_score
+#D from sklearn.cluster import KMeans
+#D from sklearn.decomposition import PCA
+#D  from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import WordNetLemmatizer 
 from scipy import spatial
 from gensim.models.doc2vec import TaggedDocument
@@ -51,10 +51,10 @@ Original file is located at
     https://colab.research.google.com/drive/1gxwoiBlbXvC4Qehnx07hlIG_ju37H_dh
 """
 
-import pickle
-import pandas as pd
-import warnings
-warnings.filterwarnings('ignore')
+#import pickle
+#import pandas as pd
+#import warnings
+#warnings.filterwarnings('ignore')
 
 class Topics_with_LDA_Bigram: 
 
@@ -195,7 +195,7 @@ class Topics_with_LDA_Bigram:
     import gensim.corpora as corpora
     from gensim.utils import simple_preprocess
     from gensim.models import CoherenceModel
-    from sklearn.linear_model import  LogisticRegression
+#D    from sklearn.linear_model import  LogisticRegression
     #load the model
     import pickle 
     import numpy as np
@@ -390,13 +390,13 @@ class Gwc_Bias():
       import numpy as np
       import pickle
       from sklearn import metrics
-      from sklearn.feature_extraction.text import TfidfVectorizer
-      from sklearn.feature_extraction.text import CountVectorizer
-      from sklearn.model_selection import train_test_split
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import classification_report
-      from sklearn.preprocessing import StandardScaler 
-      from scipy import sparse
+#D      from sklearn.feature_extraction.text import TfidfVectorizer
+#D      from sklearn.feature_extraction.text import CountVectorizer
+#D      from sklearn.model_selection import train_test_split
+#D      from sklearn.linear_model import LogisticRegression
+#D      from sklearn.metrics import classification_report
+#D      from sklearn.preprocessing import StandardScaler 
+#D      from scipy import sparse
       
         
       #creating the dataframe with our text so we can leverage the existing code
