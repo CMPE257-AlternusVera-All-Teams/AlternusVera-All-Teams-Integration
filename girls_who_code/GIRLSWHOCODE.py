@@ -963,9 +963,6 @@ class GirlsWhoCode_Toxicity:
   def getToxicityScore(self, headline):
     #converting the text and the label into a dataframe
     import pandas as pd
-    #mounting google drive
-    from google.colab import drive
-    drive.mount('/content/drive/')
     cols = [[headline]]
     df_testing = pd.DataFrame(cols,columns=['headline_text'])
     df_testing.head()
