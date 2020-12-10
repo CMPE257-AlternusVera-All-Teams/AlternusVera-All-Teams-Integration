@@ -24,7 +24,7 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 # nltk.download('stopwords', quiet=True)
 # import torch
 from transformers import BertTokenizer
-# import torch
+import torch
 import numpy as np
 # import pandas as pd
 # from sklearn import metrics
@@ -323,10 +323,10 @@ class Seekers_BertMcc():
       return test_input_ids, test_attention_masks
 
   
-    def get_bert_predictions(self, text,source,context,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):
+    def get_bert_predictions(self, textData, source, context, mostly_true_count, half_true_count, barely_true_count, false_count, pants_on_fire_count):
 
       #Adding some latent variables from the data
-      text     =  text+ source + context
+      text     =  textData+ source + context
       text     = self.cleaning(text)
       b_input_ids, b_input_mask = self.tokenize_text(text,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count)
       
