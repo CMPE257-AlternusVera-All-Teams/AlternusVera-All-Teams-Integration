@@ -39,9 +39,15 @@ from scipy import spatial
 from gensim.models.doc2vec import TaggedDocument
 from gensim.models import Doc2Vec
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-
 #Vader Sentiment Analyser
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+import spacy
+from string import punctuation
+from scipy.stats import wasserstein_distance
+import tensorflow as tf
+import ktrain
+import textstat
 
 """AlternusVera_Topic_LDA_Sprint4.ipynb
 
@@ -84,7 +90,7 @@ class Topics_with_LDA_Bigram:
         yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))  # deacc=True removes punctuations
 
   def data_preprocess(self, df):
-    import re
+#D2    import re
     dt_processed = df.News.values.tolist()
     # Remove new line characters
     dt_processed = [re.sub(r'[^\w\s]','',sent) for sent in dt_processed]
@@ -104,7 +110,7 @@ class Topics_with_LDA_Bigram:
 
   def lemmatization(self, texts):
     # spacy for lemmatization
-    import spacy
+#D2    import spacy
     """https://spacy.io/api/annotation"""
     nlp = spacy.load('en', disable=['parser', 'ner'])
     texts_out = []
@@ -143,7 +149,7 @@ class Topics_with_LDA_Bigram:
     return lda_model_bigram_scrapped  
 
   def format_topics_sentences(self, ldamodel, corpus, texts):
-    import pandas as pd
+#D2    import pandas as pd
     # Init output
     sent_topics_df = pd.DataFrame()
 
@@ -167,8 +173,8 @@ class Topics_with_LDA_Bigram:
 
   #Calculate sentiment polarity and find the max value. Normalize the encoded label values.
   def sentiment_analyzer_scores(self, df):
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-    import math
+#D2    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+#D2    import math
     analyser = SentimentIntensityAnalyzer()
     sentiment_score = []
     sentiment_labels = {0:'negative', 1:'positive', 2:'neutral'}
@@ -189,7 +195,7 @@ class Topics_with_LDA_Bigram:
     return vec_testing      
 
   def getTopicScoreBigramLDAModel(self, headline):
-    import pandas as pd
+#D2    import pandas as pd
     # Gensim
     import gensim
     import gensim.corpora as corpora
@@ -197,8 +203,8 @@ class Topics_with_LDA_Bigram:
     from gensim.models import CoherenceModel
 #D    from sklearn.linear_model import  LogisticRegression
     #load the model
-    import pickle 
-    import numpy as np
+#D2    import pickle 
+#D2    import numpy as np
 
     cols = [[headline]]
     df_testing = pd.DataFrame(cols,columns=['News'])
@@ -289,11 +295,11 @@ class Gwc_Bias():
 
     def cleaning(self, raw_news):
       import nltk
-      import re
+#D2      import re
       from nltk.stem.wordnet import WordNetLemmatizer
       lemmatizer = nltk.WordNetLemmatizer()
       from nltk.corpus import stopwords
-      from string import punctuation
+#D2      from string import punctuation
       nltk.download('punkt')
       nltk.download('averaged_perceptron_tagger')
       nltk.download('wordnet')
@@ -325,8 +331,8 @@ class Gwc_Bias():
       return " ".join(wordnet_lem)
 
     def process_text(self, text):
-      import re
-      from string import punctuation
+#D2       import re
+#D2       from string import punctuation
       result = text.replace('/', '').replace('\n', '')
       result = re.sub(r'[1-9]+', 'number', result)
       result = re.sub(r'(\w)(\1{2,})', r'\1', result)
@@ -352,7 +358,7 @@ class Gwc_Bias():
       return len(list(set(pos) & set(bias_list)))
     
     def get_wasserstein_dist(self, total_spin, total_subj, total_sens, sentiment_score):
-      from scipy.stats import wasserstein_distance
+#D2      from scipy.stats import wasserstein_distance
 
       dist_from_bias = wasserstein_distance([1, 2, 0, 0.1531], [total_spin, total_subj, total_sens, sentiment_score])
       dist_from_unbias = wasserstein_distance([0, 0, 0, 0], [total_spin, total_subj, total_sens, sentiment_score])
@@ -368,7 +374,7 @@ class Gwc_Bias():
     def get_senti(self, sentence):
       import nltk.sentiment
       nltk.download('vader_lexicon')
-      from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+#D2      from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
       senti = nltk.sentiment.vader.SentimentIntensityAnalyzer()
 
       sentimentVector = []
@@ -386,10 +392,10 @@ class Gwc_Bias():
         return 1
 
     def get_bias_score(self, text):
-      import pandas as pd
-      import numpy as np
-      import pickle
-      from sklearn import metrics
+#D2      import pandas as pd
+#D2      import numpy as np
+#D2      import pickle
+#D2D      from sklearn import metrics
 #D      from sklearn.feature_extraction.text import TfidfVectorizer
 #D      from sklearn.feature_extraction.text import CountVectorizer
 #D      from sklearn.model_selection import train_test_split
@@ -795,8 +801,8 @@ class GirlsWhoCode_Toxicity:
     return df"""
 
   def __init__(self, filenameModelTX, pathModelBR): 
-      import tensorflow as tf
-      import ktrain
+#D2      import tensorflow as tf
+#D2      import ktrain
       self.modelTX = self.__load(filenameModelTX)
       self.modelBR = ktrain.load_predictor(pathModelBR)
 
@@ -806,7 +812,7 @@ class GirlsWhoCode_Toxicity:
           return pickle.load(file) 
          
   def cleaning(self, raw_news):
-    import re
+#D2    import re
     import nltk
     from nltk.stem.wordnet import WordNetLemmatizer
     nltk.download('punkt')
@@ -839,7 +845,6 @@ class GirlsWhoCode_Toxicity:
     return " ".join(stems)
 
   def getDataFrameWithToxicity(self, df):
-
     # toxicityPredictor = ktrain.load_predictor('/content/drive/MyDrive/MLFall2020/girlswhocode/models/BERTOnLiarLiar')
     news = df.loc[:,'headline_text']
     dt = news.values
@@ -852,8 +857,7 @@ class GirlsWhoCode_Toxicity:
     return df
 
   def getSentiment(self, df):
-
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+#D2    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
     sid_obj = SentimentIntensityAnalyzer()
     for i in range(len(df)) :
       sentiment_dict = sid_obj.polarity_scores(df.loc[i,"headline_text"])
@@ -885,7 +889,7 @@ class GirlsWhoCode_Toxicity:
 
   def identify_topic_number_score(self, df,text):
     import gensim
-    import pandas as pd
+#D2    import pandas as pd
     documents = df[['headline_text']]
     processed_docs = documents['headline_text'].map(self.get_word_tokens)
     dictionary = gensim.corpora.Dictionary(processed_docs)
@@ -907,8 +911,8 @@ class GirlsWhoCode_Toxicity:
 
 
   def sentiment_analyzer_scores(self, df):
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-    import math
+#D2    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+#D2    import math
     analyser = SentimentIntensityAnalyzer()
     sentiment_score = []
     sentiment_labels = {0:'negative', 1:'positive', 2:'neutral'}
@@ -955,7 +959,7 @@ class GirlsWhoCode_Toxicity:
     return tagged_text
 
   def getReadability(self, df):
-    import textstat
+#D2    import textstat
     df['ARI'] = df.headline_text.apply(lambda x:textstat.automated_readability_index(x))
     df['DCR'] = df.headline_text.apply(lambda x:textstat.dale_chall_readability_score(x))
     df['TS'] = df.headline_text.apply(lambda x:textstat.text_standard(x,float_output =True))
@@ -964,7 +968,7 @@ class GirlsWhoCode_Toxicity:
 
   def getToxicityScore(self, headline):
     #converting the text and the label into a dataframe
-    import pandas as pd
+#D2    import pandas as pd
     cols = [[headline]]
     df_testing = pd.DataFrame(cols,columns=['headline_text'])
     df_testing.head()
@@ -992,13 +996,13 @@ class GirlsWhoCode_Toxicity:
 
     from gensim.models.doc2vec import TaggedDocument
     from gensim.models import Doc2Vec
-    import numpy as np
+#D2    import numpy as np
     df_testing[['topic_number','topic_score']] = df_testing.apply(lambda row: self.identify_topic_number_score(df_testing,row['headline_text']), axis=1)
     df_testing = self.getReadability(df_testing)
     X_test = np.array(self.testing_dataset_vector(df_testing))
     X_test =  X_test.reshape(-1, 1)
     #y_test = df_testing['label']
-    import pickle
+#D2    import pickle
 
     #fake_news_classifier = pickle.load(open('/content/drive/MyDrive/MLFall2020/girlswhocode/models/toxicityModel.sav', 'rb'))
     cols = list(df_testing.columns)
