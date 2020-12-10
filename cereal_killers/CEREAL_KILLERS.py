@@ -96,8 +96,8 @@ class CerealKillers_SocialCredibility:
     
 
   def __load(self, path):
-		with open(path, 'rb') as file:
-			return pickle.load(file)
+    with open(path, 'rb') as file:
+      return pickle.load(file)
 
 
   ## Call this first when "name" is present
