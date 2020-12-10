@@ -11,7 +11,6 @@ import pandas as pd
 import numpy as np
 import re
 import pickle
-from tqdm import tqdm
 from sklearn import feature_extraction
 import xgboost as xgb
 import statistics
@@ -54,7 +53,7 @@ class StanceDitectionFeature():
 
     def word_overlap_features(self,headlines, bodies):
       X = []
-      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+      for i, (headline, body) in (enumerate(zip(headlines, bodies))):
           clean_headline = self.clean(headline)
           clean_body = self.clean(body)
           clean_headline = self.get_tokenized_lemmas(clean_headline)
@@ -82,7 +81,7 @@ class StanceDitectionFeature():
           'retract'
       ]
       X = []
-      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+      for i, (headline, body) in (enumerate(zip(headlines, bodies))):
           clean_headline = self.clean(headline)
           clean_headline = self.get_tokenized_lemmas(clean_headline)
           features = [1 if word in clean_headline else 0 for word in _refuting_words]
@@ -110,7 +109,7 @@ class StanceDitectionFeature():
           tokens = self.get_tokenized_lemmas(text)
           return sum([t in _refuting_words for t in tokens]) % 2
       X = []
-      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+      for i, (headline, body) in (enumerate(zip(headlines, bodies))):
           clean_headline = self.clean(headline)
           clean_body = self.clean(body)
           features = []
@@ -207,7 +206,7 @@ class StanceDitectionFeature():
           return features
 
       X = []
-      for i, (headline, body) in tqdm(enumerate(zip(headlines, bodies))):
+      for i, (headline, body) in (enumerate(zip(headlines, bodies))):
           X.append(binary_co_occurence(headline, body)
                    + binary_co_occurence_stops(headline, body)
                    + count_grams(headline, body))
