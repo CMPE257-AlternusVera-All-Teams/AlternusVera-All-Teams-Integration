@@ -12,22 +12,15 @@ import string
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 stemmer = SnowballStemmer('english')
 
-
 import re
 from nltk.stem.wordnet import WordNetLemmatizer
 lemmatizer = nltk.WordNetLemmatizer()
-# from nltk.corpus import stopwords
 from string import punctuation
 nltk.download('punkt', quiet=True)
 nltk.download('averaged_perceptron_tagger', quiet=True)
-# nltk.download('wordnet', quiet=True)
-# nltk.download('stopwords', quiet=True)
-# import torch
 from transformers import BertTokenizer
 import torch
 import numpy as np
-# import pandas as pd
-# from sklearn import metrics
 from sklearn.preprocessing import StandardScaler 
 from scipy import sparse
 from transformers import BertForSequenceClassification
@@ -206,26 +199,6 @@ Original file is located at
     https://colab.research.google.com/drive/1i4iQgvzkWh8TUDh9KmYPdgmIiXK85rRE
 """
 
-# import nltk
-# import re
-# from nltk.stem.wordnet import WordNetLemmatizer
-# lemmatizer = nltk.WordNetLemmatizer()
-# from nltk.corpus import stopwords
-# from string import punctuation
-# nltk.download('punkt')
-# nltk.download('averaged_perceptron_tagger')
-# nltk.download('wordnet')
-# nltk.download('stopwords')
-# import torch
-# from transformers import BertTokenizer
-# import torch
-# import numpy as np
-# import pandas as pd
-# # from sklearn import metrics
-# from sklearn.preprocessing import StandardScaler 
-# # from scipy import sparse
-# from transformers import BertForSequenceClassification
-# import torch.nn.functional as F
 
 class Seekers_BertMcc():
 
