@@ -1505,7 +1505,7 @@ class TitleVsBody():
         #print('pred_y.shape:', pred_y.shape)
         #print('pred_y:', pred_y)
         
-        print("predicted titleVsBody:", str(pred_y))
+        #print("predicted titleVsBody:", str(pred_y))
 
         return pred_y
 
