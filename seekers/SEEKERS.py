@@ -229,7 +229,12 @@ Original file is located at
 
 class Seekers_BertMcc():
 
-    def cleaning(raw_data):
+    def __init__(self, pathModelBR): 
+        self.modelBR = BertForSequenceClassification.from_pretrained(pathModelBR)
+        # model = BertForSequenceClassification.from_pretrained("/content/")
+
+
+    def cleaning(self, raw_data):
     
       # 1. Remove non-letters/Special Characters and Punctuations
       data = re.sub("[^a-zA-Z]", " ", str(raw_data))
@@ -255,7 +260,7 @@ class Seekers_BertMcc():
       # 8. Join the stemmed words back into one string separated by space, and return the result.
       return " ".join(wordnet_lem)
 
-    def scaleTruth(mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):  
+    def scaleTruth(self, mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):  
 
       max_len = 300
       cols = ['mostly_true_count','half_true_count','barely_true_count','false_count','pants_on_fire_count']
@@ -270,10 +275,10 @@ class Seekers_BertMcc():
       history_features = np.concatenate((history_features,suffix),axis=1)
       return history_features
 
-    def tokenize_text(text,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):
+    def tokenize_text(self, text,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):
       textline = []
       # Load the BERT tokenizer.
-      X_t = Seekers_BertMcc.scaleTruth(mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count)
+      X_t = self.scaleTruth(mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count)
       tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
       input_ids = []
       attention_masks = []
@@ -318,18 +323,18 @@ class Seekers_BertMcc():
       return test_input_ids, test_attention_masks
 
   
-    def get_bert_predictions(text,source,context,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):
+    def get_bert_predictions(self, text,source,context,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count):
 
       #Adding some latent variables from the data
       text     =  text+ source + context
-      text     = Seekers_BertMcc.cleaning(text)
-      b_input_ids, b_input_mask = Seekers_BertMcc.tokenize_text(text,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count)
+      text     = self.cleaning(text)
+      b_input_ids, b_input_mask = self.tokenize_text(text,mostly_true_count,half_true_count,barely_true_count,false_count,pants_on_fire_count)
       
       #storing values to GPU
       b_input_ids.cuda()
       b_input_mask.cuda()
 
-      model = BertForSequenceClassification.from_pretrained("/content/")
+      model = self.modelBR #BertForSequenceClassification.from_pretrained("/content/")
 
       # model.cuda()
       desc = model.cuda()
