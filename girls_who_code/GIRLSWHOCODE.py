@@ -792,9 +792,11 @@ class GirlsWhoCode_Toxicity:
     df.label[df.label == 'pants-fire'] = 0
     return df"""
 
-  def __init__(self, filenameModelTX, filenameModelBR): 
+  def __init__(self, filenameModelTX, pathModelBR): 
+      import tensorflow as tf
+      import ktrain
       self.modelTX = self.__load(filenameModelTX)
-      self.modelBR = self.__load(filenameModelBR)
+      self.modelBR = ktrain.load_predictor(pathModelBR)
 
 
   def __load(self, path):
@@ -835,9 +837,6 @@ class GirlsWhoCode_Toxicity:
     return " ".join(stems)
 
   def getDataFrameWithToxicity(self, df):
-
-    import tensorflow as tf
-    import ktrain
 
     # toxicityPredictor = ktrain.load_predictor('/content/drive/MyDrive/MLFall2020/girlswhocode/models/BERTOnLiarLiar')
     news = df.loc[:,'headline_text']
