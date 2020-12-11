@@ -5,13 +5,15 @@ from sigma.SIGMA import NetworkBasedPredictor, MalicousAccount, Credibility, Ver
 from shining_unicorns.SHINING_UNICORNS import ContentStatistics
 from pygooglenews import GoogleNews
 import en_core_web_md
+import os
+
 
 nlp = en_core_web_md.load()
-nbp = NetworkBasedPredictor('/home/achal/code/AlternusVera-All-Teams-Integration/sigma/networkbased.pkl')
-ma = MalicousAccount('/home/achal/code/AlternusVera-All-Teams-Integration/sigma/malicious_account_MLP.pkl')
-cd = Credibility('/home/achal/code/AlternusVera-All-Teams-Integration/sigma/credibility_model.pkl')
-va = VerifiableAuthenticity('/home/achal/code/AlternusVera-All-Teams-Integration/sigma/VerifiableAuthenticity_PickledModel.pkl')
-cs = ContentStatistics('/home/achal/code/AlternusVera-All-Teams-Integration/shining_unicorns/finalized_model3.sav')
+nbp = NetworkBasedPredictor(os.path.relpath('sigma/networkbased.pkl'))
+ma = MalicousAccount(os.path.relpath('sigma/malicious_account_MLP.pkl'))
+cd = Credibility(os.path.relpath('sigma/credibility_model.pkl'))
+va = VerifiableAuthenticity(os.path.relpath('sigma/VerifiableAuthenticity_PickledModel.pkl'))
+cs = ContentStatistics(os.path.relpath('shining_unicorns/finalized_model3.sav'))
 
 
 def search_news(text):
