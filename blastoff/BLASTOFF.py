@@ -2,20 +2,29 @@ import pandas as pd
 import numpy as np
 import csv
 import gensim
-from sklearn.model_selection import train_test_split
 import re
 import nltk
-nltk.download('stopwords')
-nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords', quiet=True)
+nltk.download('averaged_perceptron_tagger', quiet=True)
 from scipy import sparse
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize 
-nltk.download('punkt')
+nltk.download('punkt', quiet=True)
 from zipfile import ZipFile
 import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from googlesearch import search
 import keras
+
+
+#Imports
+import torch
+from transformers import BertTokenizer
+from torch.utils.data import TensorDataset
+from transformers import BertForSequenceClassification
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+# from google_drive_downloader import GoogleDriveDownloader as gdd
+
 
 class Context_Veracity():
   def __init__(self, veracity_models):
@@ -123,63 +132,91 @@ class Context_Veracity():
     
     return count
   
-  def encode(self, X_train):
-    bcv_tc = []
-    bcv_v = []
-    for s in X_train['Statement'].tolist():
-        tc, v = self.get_source_count_and_veracity(s)
-        bcv_tc.append(tc)
-        bcv_v.append(v)
-    bcv_d = {'title_count': bcv_tc, 'veracity': bcv_v}
-    bcv_e_X_train = pd.DataFrame(data=bcv_d)
-    
-    gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
-                                      dest_path='./bcv_encoder.zip',
-                                      unzip=False)
-    archive = ZipFile('bcv_encoder.zip')
-    for file in archive.namelist():
-        archive.extract(file, '/content/')
-    bcv_encoder = keras.models.load_model('/content/bcv_encoder')
-    bcv_e_X_train = bcv_encoder.predict(bcv_e_X_train[['title_count', 'veracity']])
-    
-    return bcv_e_X_train
-  
-  #Method for Liar dataset
-  def liar_encode(self, X_train):
-    train_news = X_train
-    #train_news = train_news.dropna(subset=['label'])
-    import pandas as pd
-    import numpy as np
-    from sklearn.preprocessing import LabelEncoder
 
-    # creating instance of labelencoder
-    labelencoder = LabelEncoder()
-    # Assigning numerical values and storing in another column
-    #train_news['label_cat'] = labelencoder.fit_transform(train_news['label'])
-    train_news['veracity'] = 0
-    #Find veracity
-    for index, row in train_news.iterrows():
-      if (train_news.loc[index, 'barelytruecounts'] > 4) | (train_news.loc[index, 'falsecounts'] >= 2) | (train_news.loc[index, 'pantsonfirecounts'] >= 1):
-        train_news.loc[index,'veracity'] = 0
-      else:
-        if (train_news.loc[index, 'halftruecounts'] >= 2) | (train_news.loc[index, 'mostlytruecounts'] >= 1):
-          train_news.loc[index,'veracity'] = 1
+
+class SensaScorer():
+  def __init__(self, sensationalist_model):
+    # self.sensa_dict = {1:'Barely sensationalist',0: 'Not sensationalist',2:'Sensationalist'}
+    self.sensa_dict = {1:0.55,0:0.25,2:0.95}
+    self.label_dict = {'Barely sensationalist': 1, 'Not sensationalist': 0, 'Sensationalist': 2}
+    self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    self.model = BertForSequenceClassification.from_pretrained("bert-base-uncased",
+                                                              num_labels=len(self.label_dict),
+                                                              output_attentions=False,
+                                                              output_hidden_states=False)
+    self.model.to(self.device)
+    self.sensaModel = sensationalist_model
+    # gdd.download_file_from_google_drive(file_id='1SpfmiCq2a2aXTXvFW6cHnm-0eBCpcyxY',
+    #                               dest_path='./sensationalism_BERT_best.model',
+    #                               unzip=False)
+    self.model.load_state_dict(torch.load(self.sensaModel, 
+                                      map_location=torch.device('cpu')))
+    self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
+                                              do_lower_case=True)
+
+  def getScore(self,title):
+    # self.model.load_state_dict(torch.load(self.sensaModel, 
+    #                                   map_location=torch.device('cpu')))
+    # self.model.load_state_dict(torch.load('sensationalism_BERT_best.model', 
+    #                                   map_location=torch.device('cpu')))
+    prediction = self.evaluateSentimentScore(title)
+    
+    return prediction
+
+  #1 Function that receives a String with max 250 characters
+  def evaluateSentimentScore(self,news_title):
+    #Add title string to dataframe
+    df = pd.DataFrame(columns=['English','label'])
+    df.loc[0]=[news_title,0]
+    #Instantiate BERT Tokenizer
+    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
+    #                                           do_lower_case=True)
+    
+    #Econded record(s)
+    encoded_data = self.tokenizer.batch_encode_plus(
+      df.English.values, 
+      add_special_tokens=True, 
+      return_attention_mask=True, 
+      pad_to_max_length=True, 
+      max_length=256, 
+      return_tensors='pt'
+      )
+    #Get inputs_ids_val and attention_masks_val
+    input_ids = encoded_data['input_ids']
+    attention_masks = encoded_data['attention_mask']
+    labels = torch.tensor([0])
+    #Tensor Dataset
+    dataset = TensorDataset(input_ids, attention_masks, labels)
+    #Create dataloader
+    dataloader = DataLoader(dataset,
+                            sampler=SequentialSampler(dataset),
+                            batch_size=1)
+    #Call evalation method and return values
+    return self.evaluate(dataloader)
+
+  # 2 Define Evaluation method Similar to evaluate but 
+  def evaluate(self,dataloader):
+    self.model.eval()
+
+    loss_val_total = 0
+    predictions, true_vals = [], []
+    
+    for batch in dataloader:
         
-    train_news = train_news.dropna(how='any',axis=0)
-    train_news = train_news.rename(columns={'headline_text': 'Statement', 'speaker': 'Source'})
+        batch = tuple(b.to(self.device) for b in batch)
+        
+        inputs = {'input_ids':      batch[0],
+                  'attention_mask': batch[1],
+                  'labels':         batch[2],
+                  }
 
-    #Find source count
-    col_to_avg = ['barelytruecounts', 'falsecounts', 'pantsonfirecounts', 'halftruecounts', 'mostlytruecounts']
-    train_news['title_count'] = train_news[col_to_avg].mean(axis=1)
-    train_news['title_count'] = train_news['title_count'].astype(int)
+        with torch.no_grad():        
+            outputs = self.model(**inputs)
+            
+        logits = outputs[1]
+        logits = logits.detach().cpu().numpy()
+        predictions.append(logits)
     
-    gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
-                                      dest_path='./bcv_encoder.zip',
-                                      unzip=False)
-    archive = ZipFile('bcv_encoder.zip')
-    for file in archive.namelist():
-        archive.extract(file, '/content/')
-    bcv_encoder = keras.models.load_model('/content/bcv_encoder')
-    bcv_e_X_train = bcv_encoder.predict(train_news[['title_count', 'veracity']])
-    
-    return bcv_e_X_train
+    preds = np.concatenate(predictions, axis=0)
+    preds_flat = np.argmax(preds, axis=1).flatten()
+    return self.sensa_dict[preds_flat[0]]
