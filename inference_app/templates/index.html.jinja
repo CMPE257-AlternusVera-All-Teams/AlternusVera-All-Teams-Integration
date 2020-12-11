@@ -113,8 +113,8 @@
             evt.preventDefault();
             var text = document.querySelector('#text-input').value;
             console.log(text)
-            var venue = document.querySelector('#venue-input').value;
-            ajax.post("/prediction", JSON.stringify({ text, venue })).then(function (res) {
+            var source = document.querySelector('#source-input').value;
+            ajax.post("/prediction", JSON.stringify({ text, source })).then(function (res) {
                 var predictions = Object.values(res.data);
                 var {label, value} = getPredictionValue(predictions);
                 var predAlert = document.querySelector('#prediction-alert');
@@ -160,8 +160,8 @@
                 <div class="card-body">
                     <form id="prediction_form">
                         <div class="mb-3">
-                            <label for="venue-input" class="form-label">Venue</label>
-                            <input type="text" class="form-control" id="venue-input" placeholder="Enter venue">
+                            <label for="source-input" class="form-label">Source</label>
+                            <input type="text" class="form-control" id="source-input" placeholder="Enter source">
                         </div>
                         <div class="mb-3">
                             <label for="text-input" class="form-label">Text</label>
