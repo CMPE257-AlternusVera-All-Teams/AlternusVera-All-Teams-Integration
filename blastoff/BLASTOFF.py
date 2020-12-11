@@ -23,7 +23,7 @@ from transformers import BertTokenizer
 from torch.utils.data import TensorDataset
 from transformers import BertForSequenceClassification
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from google_drive_downloader import GoogleDriveDownloader as gdd
+# from google_drive_downloader import GoogleDriveDownloader as gdd
 
 
 class Context_Veracity():
@@ -132,73 +132,72 @@ class Context_Veracity():
     
     return count
   
-  def encode(self, X_train):
-    bcv_tc = []
-    bcv_v = []
-    for s in X_train['Statement'].tolist():
-        tc, v = self.get_source_count_and_veracity(s)
-        bcv_tc.append(tc)
-        bcv_v.append(v)
-    bcv_d = {'title_count': bcv_tc, 'veracity': bcv_v}
-    bcv_e_X_train = pd.DataFrame(data=bcv_d)
+  # def encode(self, X_train):
+  #   bcv_tc = []
+  #   bcv_v = []
+  #   for s in X_train['Statement'].tolist():
+  #       tc, v = self.get_source_count_and_veracity(s)
+  #       bcv_tc.append(tc)
+  #       bcv_v.append(v)
+  #   bcv_d = {'title_count': bcv_tc, 'veracity': bcv_v}
+  #   bcv_e_X_train = pd.DataFrame(data=bcv_d)
     
-    gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
-                                      dest_path='./bcv_encoder.zip',
-                                      unzip=False)
-    archive = ZipFile('bcv_encoder.zip')
-    for file in archive.namelist():
-        archive.extract(file, '/content/')
-    bcv_encoder = keras.models.load_model('/content/bcv_encoder')
-    bcv_e_X_train = bcv_encoder.predict(bcv_e_X_train[['title_count', 'veracity']])
+  #   gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
+  #                                     dest_path='./bcv_encoder.zip',
+  #                                     unzip=False)
+  #   archive = ZipFile('bcv_encoder.zip')
+  #   for file in archive.namelist():
+  #       archive.extract(file, '/content/')
+  #   bcv_encoder = keras.models.load_model('/content/bcv_encoder')
+  #   bcv_e_X_train = bcv_encoder.predict(bcv_e_X_train[['title_count', 'veracity']])
     
-    return bcv_e_X_train
+  #   return bcv_e_X_train
   
-  #Method for Liar dataset
-  def liar_encode(self, X_train):
-    train_news = X_train
-    #train_news = train_news.dropna(subset=['label'])
-    import pandas as pd
-    import numpy as np
-    from sklearn.preprocessing import LabelEncoder
+  # #Method for Liar dataset
+  # def liar_encode(self, X_train):
+  #   train_news = X_train
+  #   #train_news = train_news.dropna(subset=['label'])
+  #   import pandas as pd
+  #   import numpy as np
+  #   from sklearn.preprocessing import LabelEncoder
 
-    # creating instance of labelencoder
-    labelencoder = LabelEncoder()
-    # Assigning numerical values and storing in another column
-    #train_news['label_cat'] = labelencoder.fit_transform(train_news['label'])
-    train_news['veracity'] = 0
-    #Find veracity
-    for index, row in train_news.iterrows():
-      if (train_news.loc[index, 'barelytruecounts'] > 4) | (train_news.loc[index, 'falsecounts'] >= 2) | (train_news.loc[index, 'pantsonfirecounts'] >= 1):
-        train_news.loc[index,'veracity'] = 0
-      else:
-        if (train_news.loc[index, 'halftruecounts'] >= 2) | (train_news.loc[index, 'mostlytruecounts'] >= 1):
-          train_news.loc[index,'veracity'] = 1
+  #   # creating instance of labelencoder
+  #   labelencoder = LabelEncoder()
+  #   # Assigning numerical values and storing in another column
+  #   #train_news['label_cat'] = labelencoder.fit_transform(train_news['label'])
+  #   train_news['veracity'] = 0
+  #   #Find veracity
+  #   for index, row in train_news.iterrows():
+  #     if (train_news.loc[index, 'barelytruecounts'] > 4) | (train_news.loc[index, 'falsecounts'] >= 2) | (train_news.loc[index, 'pantsonfirecounts'] >= 1):
+  #       train_news.loc[index,'veracity'] = 0
+  #     else:
+  #       if (train_news.loc[index, 'halftruecounts'] >= 2) | (train_news.loc[index, 'mostlytruecounts'] >= 1):
+  #         train_news.loc[index,'veracity'] = 1
         
-    train_news = train_news.dropna(how='any',axis=0)
-    train_news = train_news.rename(columns={'headline_text': 'Statement', 'speaker': 'Source'})
+  #   train_news = train_news.dropna(how='any',axis=0)
+  #   train_news = train_news.rename(columns={'headline_text': 'Statement', 'speaker': 'Source'})
 
-    #Find source count
-    col_to_avg = ['barelytruecounts', 'falsecounts', 'pantsonfirecounts', 'halftruecounts', 'mostlytruecounts']
-    train_news['title_count'] = train_news[col_to_avg].mean(axis=1)
-    train_news['title_count'] = train_news['title_count'].astype(int)
+  #   #Find source count
+  #   col_to_avg = ['barelytruecounts', 'falsecounts', 'pantsonfirecounts', 'halftruecounts', 'mostlytruecounts']
+  #   train_news['title_count'] = train_news[col_to_avg].mean(axis=1)
+  #   train_news['title_count'] = train_news['title_count'].astype(int)
     
-    gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
-                                      dest_path='./bcv_encoder.zip',
-                                      unzip=False)
-    archive = ZipFile('bcv_encoder.zip')
-    for file in archive.namelist():
-        archive.extract(file, '/content/')
-    bcv_encoder = keras.models.load_model('/content/bcv_encoder')
-    bcv_e_X_train = bcv_encoder.predict(train_news[['title_count', 'veracity']])
+  #   gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
+  #                                     dest_path='./bcv_encoder.zip',
+  #                                     unzip=False)
+  #   archive = ZipFile('bcv_encoder.zip')
+  #   for file in archive.namelist():
+  #       archive.extract(file, '/content/')
+  #   bcv_encoder = keras.models.load_model('/content/bcv_encoder')
+  #   bcv_e_X_train = bcv_encoder.predict(train_news[['title_count', 'veracity']])
     
-    return bcv_e_X_train
-
+  #   return bcv_e_X_train
 
 
 
 
 class SensaScorer():
-  def __init__(self):
+  def __init__(self, sensationalist_model):
     # self.sensa_dict = {1:'Barely sensationalist',0: 'Not sensationalist',2:'Sensationalist'}
     self.sensa_dict = {1:0.55,0:0.25,2:0.95}
     self.label_dict = {'Barely sensationalist': 1, 'Not sensationalist': 0, 'Sensationalist': 2}
@@ -208,13 +207,16 @@ class SensaScorer():
                                                               output_attentions=False,
                                                               output_hidden_states=False)
     self.model.to(self.device)
-    gdd.download_file_from_google_drive(file_id='1SpfmiCq2a2aXTXvFW6cHnm-0eBCpcyxY',
-                                  dest_path='./sensationalism_BERT_best.model',
-                                  unzip=False)
+    self.sensaModel = sensationalist_model
+    # gdd.download_file_from_google_drive(file_id='1SpfmiCq2a2aXTXvFW6cHnm-0eBCpcyxY',
+    #                               dest_path='./sensationalism_BERT_best.model',
+    #                               unzip=False)
     
   def getScore(self,title):
-    self.model.load_state_dict(torch.load('sensationalism_BERT_best.model', 
+    self.model.load_state_dict(torch.load(self.sensaModel, 
                                       map_location=torch.device('cpu')))
+    # self.model.load_state_dict(torch.load('sensationalism_BERT_best.model', 
+    #                                   map_location=torch.device('cpu')))
     prediction = self.evaluateSentimentScore(title)
     
     return prediction
