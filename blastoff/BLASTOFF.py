@@ -151,7 +151,9 @@ class SensaScorer():
     #                               unzip=False)
     self.model.load_state_dict(torch.load(self.sensaModel, 
                                       map_location=torch.device('cpu')))
-    
+    self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
+                                              do_lower_case=True)
+
   def getScore(self,title):
     # self.model.load_state_dict(torch.load(self.sensaModel, 
     #                                   map_location=torch.device('cpu')))
@@ -167,10 +169,11 @@ class SensaScorer():
     df = pd.DataFrame(columns=['English','label'])
     df.loc[0]=[news_title,0]
     #Instantiate BERT Tokenizer
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
-                                              do_lower_case=True)
+    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
+    #                                           do_lower_case=True)
+    
     #Econded record(s)
-    encoded_data = tokenizer.batch_encode_plus(
+    encoded_data = self.tokenizer.batch_encode_plus(
       df.English.values, 
       add_special_tokens=True, 
       return_attention_mask=True, 
