@@ -1,0 +1,211 @@
+{% extends 'layouts/default.html.jinja' %}
+
+{% block title %}Smooth sailing Alternus Vera{% endblock %}
+
+{% block content_javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    function get_prediction_label(prediction) {
+        console.log(prediction);
+        let response;
+        switch (true) {
+            case prediction < 0.1:
+                response = 'Pants on Fire';
+                break;
+            case prediction < 0.24:
+                response = 'False';
+                break;
+            case prediction < 0.4:
+                response = 'Barely True';
+                break;
+            case prediction < 0.56:
+                response = 'Half True';
+                break;
+            case prediction < 0.73:
+                response = 'Mostly True';
+                break;
+            case prediction <= 1:
+                response = 'True';
+                break;
+        }
+        return response;
+    }
+
+    var predictMap = {
+        'Pants on Fire': 'danger',
+        'False': 'warning',
+        'Barely True': 'secondary',
+        'Half True': 'info',
+        'Mostly True': 'primary',
+        'True': 'success'
+    };
+
+    function getPredictionValue(predictions) {
+        var weights = [0.2, 0.2, 0.2, 0.2, 0.2];
+        console.log(predictions);
+        var predict = predictions.map(function (pred, idx) {
+            return weights[idx] * pred;
+        }).reduce(function (acc, curr) {
+            return acc + curr;
+        }, 0);
+        return {label: get_prediction_label(predict), value: predict};
+    }
+
+    (function () {
+        ajax = axios.create({
+            headers: {
+                "content-type": "application/json"
+            }
+        });
+
+
+        function generateTextBlock(title, message, predictLabel = null) {
+            var textBlock = document.querySelector("#realtime-text");
+            var header = document.createElement("h5");
+            var content = document.createElement("p");
+            header.append(
+                document.createTextNode(title)
+            );
+            content.append(
+                document.createTextNode(message)
+            );
+            textBlock.append(header);
+            if(predictLabel) {
+                var predictBlock = document.createElement("h4");
+                predictBlock.append(
+                    document.createTextNode(predictLabel)
+                );
+                predictBlock.classList.add('text-center');
+                predictBlock.classList.add(`text-${predictMap[predictLabel]}`);
+                textBlock.append(predictBlock);
+            }
+            textBlock.append(content);
+            
+        }
+
+        function getPrediction(topic = "TRUMP") {
+            var spinner = document.querySelector("#realtime-spinner");
+            var textBlock = document.querySelector("#realtime-text");
+            textBlock.innerHTML = "";
+            spinner.classList.remove("d-none");
+            textBlock.classList.add("d-none");
+            axios.get(`/realtime-prediction/${topic}`).then(function (response) {
+                var predictions = Object.values(response.data).filter(function (num) {
+                    return !isNaN(Number(num));
+                });
+                var {label, value} = getPredictionValue(predictions);
+                var title = `Latest news from - ${response.data.publisher}, Prediction: (${value.toFixed(2)})`;
+                var message = response.data.article;
+                generateTextBlock(title, message, label);
+                spinner.classList.add("d-none");
+                textBlock.classList.remove("d-none");
+            }).catch(function (err) {
+                console.log(err);
+                textBlock.innerHTML = '';
+                generateTextBlock("Realtime Prediction", "Sorry we couldn't find that topic. Try again.")
+                spinner.classList.add("d-none");
+                textBlock.classList.remove("d-none");
+            });
+        }
+
+        var pred_form = document.querySelector("#prediction_form");
+        pred_form.addEventListener("submit", function (evt) {
+            evt.preventDefault();
+            var text = document.querySelector('#text-input').value;
+            console.log(text)
+            var venue = document.querySelector('#venue-input').value;
+            ajax.post("/prediction", JSON.stringify({ text, venue })).then(function (res) {
+                var predictions = Object.values(res.data);
+                var {label, value} = getPredictionValue(predictions);
+                var predAlert = document.querySelector('#prediction-alert');
+                console.log(label, value);
+                predAlert.innerHTML = '';
+                predAlert.appendChild(
+                    document.createTextNode(`We determine that this news is - ${label}, ${value.toFixed(2)}`)
+                );
+                predAlert.classList.remove('d-none');
+                setTimeout(function () {
+                    predAlert.classList.add('d-none');
+                }, 10000);
+            });
+        });
+
+        var realtime_form = document.querySelector("#realtime-pred-form");
+        realtime_form.addEventListener("submit", function(evt) {
+            evt.preventDefault();
+            var topic = document.querySelector('#topic-input').value;
+            console.log(topic);
+            getPrediction(topic);
+        });
+        // get first prediction for trump.
+        getPrediction();
+    })();
+</script>
+{% endblock %}
+
+{% block navbar_title%}Smooth sailing Alternus Vera{% endblock %}
+{% block content %}
+<main class="container">
+    <section class="row mt-4">
+        <div class="text-center">
+            <div id="prediction-alert" class="alert alert-dark d-none" role="alert">
+            </div>
+        </div>
+        <!-- Prediction -->
+        <div class="col col-lg-6 col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white text-center">
+                    <h5 class="my-0">Get Prediction</h5>
+                </div>
+                <div class="card-body">
+                    <form id="prediction_form">
+                        <div class="mb-3">
+                            <label for="venue-input" class="form-label">Venue</label>
+                            <input type="text" class="form-control" id="venue-input" placeholder="Enter venue">
+                        </div>
+                        <div class="mb-3">
+                            <label for="text-input" class="form-label">Text</label>
+                            <textarea class="form-control" id="text-input" rows="3"
+                                placeholder="Enter text for prediction here"></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-dark" type="submit">
+                                Get Prediction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Realtime -->
+        <div class="col col-lg-6 col-md-12">
+            <div class="d-lg-none d-md-block mt-4"></div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white text-center">
+                    <h5 class="my-0">Get Realtime Prediction</h5>
+                </div>
+                <div class="card-body">
+                    <div id="realtime-spinner" class="text-center d-none">
+                        <div class="spinner-border text-dark" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="realtime-text" class="d-none">
+                    </div>
+                    <form id="realtime-pred-form">
+                        <div class="mb-3">
+                            <label for="topic-input" class="form-label">Topic</label>
+                            <input type="text" class="form-control" id="topic-input" placeholder="Enter Topic">
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-dark" type="submit">
+                                Get Realtime News Prediction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
