@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, render_template
 from flask_cors import cross_origin
 from sigma.SIGMA import NetworkBasedPredictor, MalicousAccount, Credibility, VerifiableAuthenticity
 from shining_unicorns.SHINING_UNICORNS import ContentStatistics
@@ -17,20 +17,20 @@ cs = ContentStatistics('/home/achal/code/AlternusVera-All-Teams-Integration/shin
 def search_news(text):
   googlenews = GoogleNews(lang='en')
   n = googlenews.search(text)
-  return n['entries'][0]['sub_articles'][0]['title'], n['entries'][0]['sub_articles'][0]['publisher']
+  return n['entries'][0]['title'], n['entries'][0]['source']['title']
 
 
 @app.route("/")
 @cross_origin()
 def say_hello():
-    message = dict({"message": "Hello World!"})
-    return make_response(jsonify(message), 200)
+    return render_template("index.html.jinja")
 
 @app.route("/prediction", methods=["POST"])
 @cross_origin()
 def get_prediction():
     body = request.json['text']
     venue = request.json['venue']
+    print(body, venue)
     prediction = nbp.predict(body, nlp)
     ma_prediction = ma.predict(body, nlp)
     cd_pred = cd.predict(body, nlp)

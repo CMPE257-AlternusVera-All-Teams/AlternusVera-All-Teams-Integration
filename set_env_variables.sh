@@ -1,2 +1,0 @@
-export FLASK_APP=wsgi
-python -m spacy download en_core_web_md
