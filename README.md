@@ -26,9 +26,13 @@ Step 3 - Open browser with 127.0.0.1/5000
 
 For more information please see the [Google Doc](https://docs.google.com/document/d/17pD0K0t1YEezrfjzWo_tsMyBDtH1pCgkh3Z8pAdx5gI/edit?usp=sharing)
 
-
-[![Smooth Sailing AV](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1MAPOE3_XRyD43abbRHEkOWoz8j90mGWZ?usp=sharing)
 **Smooth Sailing AV**
 
-[![Real Time Inference](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1H0UR4-fYX3kzuIiz25MSLsFcu_7XbfRE?usp=sharing)
+[![Smooth Sailing AV](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1MAPOE3_XRyD43abbRHEkOWoz8j90mGWZ?usp=sharing)
+
+
 **Real Time Inference**
+
+[![Real Time Inference](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1H0UR4-fYX3kzuIiz25MSLsFcu_7XbfRE?usp=sharing)
+
+
